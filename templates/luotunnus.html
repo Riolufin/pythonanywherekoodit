@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link href="../static/tyylit.css" rel="StyleSheet" type="text/css" />
+        <title>Luo tunnus</title>
+    </head>
+    <body>
+        {% if session['onnistui']|length > 0 %}
+        <h3><a href="{{ url_for('kirjaudu') }}">{{ session['onnistui'] }}, takaisin kirjautumissivulle</a></a></h3>
+        {% endif %}
+        <form action="{{ request.base_url }}" method="POST" accept-charset="UTF-8">
+            <fieldset id="luotunnuslomake">
+                <p class="virhe">
+                    <label class="luontikentta">Uusi tunnus
+                        <input type="text" name="uusitunnus" id="uusitunnus" value="{{ kentat['tunnus'] }}" />
+                    </label>
+                    {{ virheet['tunnus'] }}
+                </p>
+                <p class="virhe">
+                    <label class="luontikentta">Salasana
+                        <input type="password" name="uusisalasana" id="uusisalasana" value="{{ kentat['salasana'] }}" />
+                    </label>
+                    {{ virheet['salasana'] }}
+                </p>
+                <p class="virhe">
+                    <label class="luontikentta">Toista salasana
+                        <input type="password" name="toistasalasana" id="toistasalasana" value="{{ kentat['toistasalasana'] }}" />
+                    </label>
+                    {{ virheet['toistasalasana'] }}
+                </p>
+                <p class="virhe">
+                    <label class="luontikentta">Sähköposti
+                        <input type="email" name="email" id="email" value="{{ kentat['email'] }}" />
+                    </label>
+                    {{ virheet['email'] }}
+                </p>
+            </fieldset>
+            <input type="submit" class="luontisubmit" name="luouusitunnus" value="Luo tunnus" />
+        </form>
+        <div class="luotunnuskirjaudulinkki"><a href="{{ url_for('kirjaudu') }}">Takaisin kirjautumissivulle</a></a></div>
+    </body>
+</html>

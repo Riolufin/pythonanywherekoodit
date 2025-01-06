@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+<!doctype html>
+<html lang="fi">
+    <head>
+        <meta charset="UTF-8">
+        {% block title %}Logout{% endblock %}
+    </head>
+    <body>
+        {% block content %}
+        <p>Haluatko varmasti kirjautua ulos?</p>
+        <form action="{{ url_for('logoutvarma') }}" method="GET">
+            <input type="submit" id="logoutnappi" name="log_out" value="Kirjaudu ulos" />
+        </form>
+        {% endblock %}
+    </body>
+</html>

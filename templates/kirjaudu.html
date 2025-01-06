@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link href="../static/tyylit.css" rel="StyleSheet" type="text/css" />
+        <title>Kirjaudu</title>
+    </head>
+    <body>
+        <h1>Kirjaudu</h1>
+        <form action="{{ request.base_url }}" method="POST" accept-charset="UTF-8">
+            <fieldset id="kirjautumislomake">
+            <p class="virhe">
+                <label class="kirjautumiskentta">Anna tunnus <input type="text" name="tunnus"
+                id="tunnus" value="{{ kentat['tunnus'] }}" /></label>{{ errors["tunnus"] }}
+            </p>
+            <p class="virhe">
+                <label class="kirjautumiskentta">Anna salasana <input type="password" name="salasana"
+                id="salasana" /></label>{{ errors["salasana"] }}
+            </p>
+            </fieldset>
+            <input class="kirjaudusubmit" type="submit" name="kirjaudu" value="Kirjaudu" />
+        </form>
+        <div class="luotunnuskirjaudulinkki"><a href="{{ url_for('luotunnus') }}">Luo tunnus</a></a></div>
+    </body>
+</html>

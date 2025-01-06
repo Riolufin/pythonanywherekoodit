@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="fi">
+  <head>
+  {% block title %}Pokeri{% endblock %}
+  {% block scripts %}
+  <script src="../static/pokeri.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  {% endblock %}
+  {% block css %}
+  <link href="../static/pokerityyli.css" rel="StyleSheet" type="text/css" />
+  {% endblock %}
+  </head>
+  <body>
+  {% block content %}
+    <div class="laskurit">
+    <div id="kerroinlaskuri">
+      <h1>Pottikerroinlaskuri</h1>
+      <p>Anna potin koko:</p>
+      <input type="text" name="potti" id="potti">
+      <p class="virhe"><span id="pottivirhe"></span></p>
+      <p>Anna maksun koko:</p>
+      <input type="text" name="maksu" id="maksu">
+      <p class="virhe"><span id="maksuvirhe"></span></p>
+      <input type="submit" name="laske" value="Laske" onclick="pokeri();">
+      <p><span id="tulos"></span></p>
+      <h3>Flopin jälkeen maksetaan vedoilla:</h3>
+      <p><ul id="maksuflop"></ul></p>
+      <h3>Turnin jälkeen maksetaan vedoilla:</h3>
+      <p><ul id="maksuriver"></ul></p>
+    </div>
+    <div id="panostus">
+        <h1>Panoskokolaskuri</h1>
+      <input type="submit" name="laskep" value="Laske" onclick="pokeripanos();">
+      <h3>Flopin jälkeen panos vetoihin:</h3>
+      <p><ul id="panosflop"></ul></p>
+      <h3>Turnin jälkeen panos vetoihin:</h3>
+      <p><ul id="panosriver"></ul></p>
+    </div>
+    </div>
+  {% endblock %}
+  </body>
+</html>

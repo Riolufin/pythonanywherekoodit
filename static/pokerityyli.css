@@ -1,0 +1,68 @@
+body{
+    width: 98%;
+    font-size: 100%;
+    margin: 1%;
+}
+
+h1{
+    width: 100%;
+    font-size: auto;
+}
+
+.virhe{
+    color: red;
+    font-size: 100%;
+}
+
+.topnav{
+    overflow: hidden;
+    float: left;
+    background-color: green;
+    padding: 0.2em;
+    padding-left: 1em;
+    width: 99%;
+    font-size: 2vh;
+}
+
+.topnav a{
+    padding-left: 1em;
+    color: black;
+}
+
+#naveka{
+    color: black;
+    padding-left: 0;
+}
+
+#navvika{
+    border: none;
+    color: black;
+    float: right;
+    text-align: center;
+    font-size: 100%;
+    padding-right: 1em;
+}
+
+.laskurit{
+    display: flex;
+    justify-content: flex-start;
+    float: left;
+}
+
+#kerroinlaskuri{
+    min-width: 25em;
+    border: 1px solid green;
+    margin-right: 1em;
+    padding: 1em;
+}
+
+#panostus{
+    min-width: 25em;
+    border: 1px solid red;
+    margin-right: 1em;
+    padding: 1em;
+}
+
+a{
+    text-decoration: none;
+}

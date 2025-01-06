@@ -1,0 +1,277 @@
+body{
+    width: 98%;
+    font-size: 5vh;
+    margin: 1%;
+}
+
+h1{
+    width: 100%;
+    font-size: 100%;
+}
+
+form{
+    width: 100%;
+    padding-right: 1em;
+}
+
+.topnav{
+    overflow: hidden;
+    float: left;
+    width: 100%;
+    background-color: green;
+    padding: 0.2em;
+    padding-left: 1em;
+    font-size: 2vh;
+}
+
+.topnav a{
+    padding-left: 1em;
+    color: black;
+}
+
+.kirjaudusubmit{
+    max-width: 50em;
+    font-size: 3vh;
+    margin-left: 1em;
+}
+
+.luontisubmit{
+    max-width: 50em;
+    font-size: 3vh;
+    margin-left: 1em;
+}
+
+.adminsubmit{
+    max-width: 50em;
+    min-height: 5vh;
+    font-size: 3vh;
+}
+
+.luotunnuskirjaudulinkki{
+    margin-top: 1em;
+    font-size: 2vh;
+}
+
+.virhe{
+    color: red;
+    font-size: 3vh;
+}
+
+#kirjautumislomake{
+    border: none;
+}
+
+#luotunnuslomake{
+    border: none;
+}
+
+.kirjautumiskentta{
+    color: black;
+    min-width: 80%;
+    font-size: 3vh;
+}
+
+.kirjautumiskentta input{
+    max-width: 50em;
+    font-size: 3vh;
+    border: 1px solid black;
+    min-height: 5vh;
+}
+
+.luontikentta{
+    color: black;
+    min-width: 80%;
+    font-size: 3vh;
+}
+
+.luontikentta input{
+    max-width: 50em;
+    font-size: 3vh;
+    border: 1px solid black;
+    min-height: 5vh;
+}
+
+#naveka{
+    color: black;
+    padding-left: 0;
+}
+
+#navvika{
+    border: none;
+    color: black;
+    float: right;
+    text-align: center;
+}
+
+.adminlista{
+    font-size: 3vh;
+    min-width: 100%;
+}
+
+input.adminbox{
+    height: 2.5vh;
+    width: 2.5vh;
+}
+
+a{
+    text-decoration: none;
+}
+
+#logoutnappi{
+    max-width: 50em;
+    min-height: 5vh;
+    font-size: 3vh;
+}
+
+.budjettisummat{
+    font-size: 2vh;
+}
+
+.aikavalintalabel{
+    font-size: 3vh;
+    float: right;
+}
+
+.budjettisummat input{
+    font-size: 3vh;
+}
+
+.lomakkeet input{
+    font-size: 3vh;
+    border: 1px solid black;
+}
+
+.lomakkeet ul{
+        margin-left: 1em;
+    }
+
+.tulot{
+    border-style: solid;
+    max-width: 20em;
+    width: 100%;
+    font-size: 3vh;
+}
+
+.tulot h3{
+    margin-left: 1em;
+}
+
+.menot{
+    border-style: solid;
+    max-width: 20em;
+    width: 100%;
+    font-size: 3vh;
+}
+
+.menot h3{
+    margin-left: 1em;
+}
+
+.syotto{
+    color: black;
+}
+
+@media only screen and (min-width: 65em){
+    body{
+        font-size: 100%;
+    }
+
+    h1{
+        font-size: 180%;
+        margin: 0;
+    }
+
+    .virhe{
+        font-size: 100%;
+    }
+
+    .topnav{
+        width: 99%;
+    }
+
+    #navvika{
+        font-size: 100%;
+        padding-right: 1em;
+    }
+
+    .adminsubmit{
+        min-height: 100%;
+        font-size: 100%;
+    }
+
+    .adminlista{
+        font-size: 100%;
+        width: 100%;
+    }
+
+    input.adminbox{
+        height: auto;
+        width: auto;
+    }
+
+    .kirjautumiskentta{
+        min-width: 100%;
+        font-size: 100%;
+    }
+
+    .kirjautumiskentta input{
+        font-size: 100%;
+        min-height: 100%;
+    }
+
+    .kirjaudusubmit{
+        font-size: 100%;
+    }
+
+    .luontikentta{
+        min-width: 100%;
+        font-size: 100%;
+    }
+
+    .luontikentta input{
+        font-size: 100%;
+        min-height: 100%;
+    }
+
+    .luontisubmit{
+        font-size: 100%;
+    }
+
+    #logoutnappi{
+        min-height: 100%;
+        font-size: 100%;
+    }
+
+    .lomakkeet{
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .lomakkeet input{
+        font-size: 100%;
+    }
+
+    .budjettisummat{
+        font-size: 100%;
+    }
+
+    .aikavalintalabel{
+        font-size: 100%;
+        float: none;
+    }
+
+    .budjettisummat input{
+        font-size: 100%;
+    }
+
+    .tulot{
+        font-size: 100%;
+        width: 20em;
+    }
+
+    .menot{
+        font-size: 100%;
+        float: right;
+        width: 20em;
+    }
+}

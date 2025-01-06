@@ -1,0 +1,142 @@
+{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="fi">
+    <head>
+        <meta charset="UTF-8">
+        {% block title %}Budjetti{% endblock %}
+    </head>
+    <body>
+        {% block content %}
+        <h1>
+            Tervetuloa takaisin {{session['kayttaja']}}!
+        </h1>
+        <div class="budjettisummat">
+        <p>Tulot yhteensä {{ kentat["tulot"] }} €</p>
+        <p>Menot yhteensä {{ kentat["menot"] }} €</p>
+        <form class="aikajakso" action="{{ request.base_url }}" method="POST">
+        <p>Valitse budjetin kesto: </p>
+        <label class="aikavalintalabel">Alku
+        <input type="date" name="alkuaika" value="{{ kentat['alkuaika'] }}"/></label>
+        <label class="aikavalintalabel"> loppu
+        <input type="date" name="loppuaika" value="{{ kentat['loppuaika'] }}"/></label>
+        <input type="submit" name="vahvistaaika" value="Vahvista"/>
+        <p class="virhe">
+                    {{ virheet["alkuaika"] }}
+        </p>
+        </form>
+        <h3>Budjetti yhteensä {{ kentat["tulos"] }} € ajalle {{ kentat['kesto'] }} päivää.</h3>
+        <h3>Päiväbudjetti on {{ kentat["paivabudjetti"] }} €.</h3>
+        </div>
+        <div class="lomakkeet">
+        <div>
+            <form class="tulot" action="{{ request.base_url }}" method="POST">
+                {% if session['muokkaa'] == 1 %}
+                <h3>Muokkaa tuloja</h3>
+                {% else %}
+                <h3>Tulot</h3>
+                {% endif %}
+                <ul>
+                    {% for i, j in tulot.items() %}
+                        {% if session['muokkaa'] == 1 %}
+                        <li>
+                            <input type="text" name="{{ i }}" value="{{ i }}"/> <input type="text" name="{{ i }}summa" value="{{ j }}"/> €
+                        </li>
+                        {% elif session['poistatulo'] == 1 %}
+                        <li>
+                            {{ i }} {{ j }} € <input type="checkbox" class="adminbox" name="{{ i }}poisto"/>
+                        </li>
+                        {% else %}
+                        <li>
+                            {{ i }} {{ j }} €
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                {% if session['muokkaa'] == 1 %}
+                <input type="submit" name="tallennatulo" value="Tallenna"/>
+                <input type="submit" name="peruutatulo" value="Peruuta"/>
+                <p class="virhe">
+                    {{ virheet["tulo"] }} {{ virheet["summa"] }}
+                </p>
+                {% elif session['poistatulo'] == 1 %}
+                <input type="submit" name="poistavarmatulo" value="Poista"/>
+                <input type="submit" name="peruutapoistotulo" value="Peruuta"/>
+                {% else %}
+                <p class="virhe">
+                    <label class="syotto">
+                    Uusi tulo
+                    <input type="text" name="uusitulo" value="{{ kentat["tulo"] }}"/>
+                    </label>
+                    {{ virheet["tulo"] }}
+                </p>
+                <p class="virhe">
+                    <label class="syotto">
+                    Summa
+                    <input type="text" name="uusitulosumma" value="{{ kentat["summa"] }}"/>
+                    </label>
+                    {{ virheet["summa"] }}
+                </p>
+                <input type="submit" name="lisaatulo" value="Lisää tulo"/>
+                <input type="submit" name="muokkaatulo" value="Muokkaa tuloja"/>
+                <input type="submit" name="poistatulo" value="Poista tuloja"/>
+                {% endif %}
+            </form>
+        </div>
+        <div>
+            <form class="menot" action="{{ request.base_url }}" method="POST">
+                {% if session['muokkaameno'] == 1 %}
+                <h3>Muokkaa menoja</h3>
+                {% else %}
+                <h3>Menot</h3>
+                {% endif %}
+                <ul>
+                    {% for i, j in menot.items() %}
+                        {% if session['muokkaameno'] == 1 %}
+                        <li>
+                            <input type="text" name="{{ i }}" value="{{ i }}"/> <input type="text" name="{{ i }}summa" value="{{ j }}"/> €
+                        </li>
+                        {% elif session['poistameno'] == 1 %}
+                        <li>
+                            {{ i }} {{ j }} € <input type="checkbox" class="adminbox" name="{{ i }}poisto"/>
+                        </li>
+                        {% else %}
+                        <li>
+                            {{ i }} {{ j }} €
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                {% if session['muokkaameno'] == 1 %}
+                <input type="submit" name="tallennameno" value="Tallenna"/>
+                <input type="submit" name="peruutameno" value="Peruuta"/>
+                <p class="virhe">
+                    {{ virheet["meno"] }} {{ virheet["menosumma"] }}
+                </p>
+                {% elif session['poistameno'] == 1 %}
+                <input type="submit" name="poistavarmameno" value="Poista"/>
+                <input type="submit" name="peruutapoistomeno" value="Peruuta"/>
+                {% else %}
+                <p class="virhe">
+                    <label class="syotto">
+                    Uusi meno
+                    <input type="text" name="uusimeno" value="{{ kentat["meno"] }}"/>
+                    </label>
+                    {{ virheet["meno"] }}
+                </p>
+                <p class="virhe">
+                    <label class="syotto">
+                    Summa
+                    <input type="text" name="uusimenosumma" value="{{ kentat["menosumma"] }}"/>
+                    </label>
+                    {{ virheet["menosumma"] }}
+                </p>
+                <input type="submit" name="lisaameno" value="Lisää meno"/>
+                <input type="submit" name="muokkaameno" value="Muokkaa menoja"/>
+                <input type="submit" name="poistameno" value="Poista menoja"/>
+                {% endif %}
+            </form>
+        </div>
+        </div>
+        {% endblock %}
+    </body>
+</html>

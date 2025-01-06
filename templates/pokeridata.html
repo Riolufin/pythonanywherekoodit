@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="fi">
+  <head>
+  {% block title %}Pokeridata{% endblock %}
+  {% block scripts %}
+  <script src="../static/pokeri.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  {% endblock %}
+  </head>
+  <body>
+  {% block content %}
+    <div class="datadivi">
+    </div>
+    <div class="uusipeli">
+        <input type="submit" name="uusipelinappi" value="Lisää uusi peli" onclick="lisaaPeli();"/>
+        <div id="lisaapelikentat">
+
+        </div>
+    </div>
+  {% endblock %}
+  </body>
+</html>

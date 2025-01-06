@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        {% block title %}Admin{% endblock %}
+    </head>
+    <body>
+        <div>
+            {% block content %}
+        <h3>Poista tunnus</h3>
+        <form action="{{ request.base_url }}" method="POST">
+            <ul class="adminlista">
+                {% for i in tunnukset %}
+                <li>
+                    <label>{{ i[0] }}, {{ i[1] }} <input type="checkbox" class="adminbox" name="{{ i[0] }}poisto"/></label>
+                </li>
+                {% endfor %}
+            </ul>
+            <input type="submit" class="adminsubmit" name="poista" value="Poista"/>
+        </form>
+            {% endblock %}
+        </div>
+    </body>
+</html>
