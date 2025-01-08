@@ -57,21 +57,19 @@ function pokeri() {
     var maksukentta = document.getElementById("maksu").value;
     //Muutetaan desimaalipilkku desimaalipisteeksi potista ja maksusta sekä
     //poistetaan tyhjät
-    pottikentta = pottikentta.replace(",",".");
-    pottikentta = pottikentta.replaceAll(" ","");
-    maksukentta = maksukentta.replace(",",".");
-    maksukentta = maksukentta.replaceAll(" ","");
+    pottikentta = poistaTyhjatJaMuutaPilkut(pottikentta);
+    maksukentta = poistaTyhjatJaMuutaPilkut(maksukentta);
     //asetetaan virhe jos maksu tai potti eivät ole positiivisia lukuja
     var pottivirhe = document.getElementById("pottivirhe");
     var maksuvirhe = document.getElementById("maksuvirhe");
     var pvirhe = "";
     var mvirhe = "";
     var virhe = 0;
-    if(isNaN(pottikentta) || pottikentta === "" || pottikentta <= 0){
-        pvirhe = "Syötä luku";
+    if(tarkistaPoslukukentta(pottikentta) === 0){
+        pvirhe = "Syötä positiivinen luku";
         virhe = 1;
     }
-    if(isNaN(maksukentta) || maksukentta === "" || maksukentta <= 0){
+    if(tarkistaPoslukukentta(maksukentta) === 0){
         mvirhe = "Syötä positiivinen luku";
         virhe = 1;
     }
@@ -135,14 +133,13 @@ function pokeripanos(){
     var pottikentta = document.getElementById("potti").value;
     //Muutetaan desimaalipilkku desimaalipisteeksi potista ja
     //poistetaan tyhjät
-    pottikentta = pottikentta.replace(",",".");
-    pottikentta = pottikentta.replaceAll(" ","");
+    pottikentta = poistaTyhjatJaMuutaPilkut(pottikentta);
     //asetetaan virhe jos potti ei ole positiivinen luku
     var pottivirhe = document.getElementById("pottivirhe");
     var maksuvirhe = document.getElementById("maksuvirhe");
     var pvirhe = "";
     var virhe = 0;
-    if(isNaN(pottikentta) || pottikentta === "" || pottikentta <= 0){
+    if(tarkistaPoslukukentta(pottikentta) === 0){
         pvirhe = "Syötä positiivinen luku";
         virhe = 1;
     }
@@ -218,4 +215,105 @@ function lisaaPeli(){
     lisayspaikka.innerHTML += `<br><br><label for="sijoitus">Sijoitus</label>
             <input type="number" id="sijoitus"/><br><br><label for="osallistujat">
             Osallistujat</label><input type="number" id="osallistujat"/>`;
+}
+
+//käsitellään fc-laivojen gilin jakolaskuri
+function laskeGil(){
+    //haetaan kenttien arvot tai kentät
+    var omagil = document.getElementById("omagil").value;
+    var laivagil = document.getElementById("laivagil").value;
+    var fcosuus = document.getElementById("fcosuus").value;
+    var saajat = document.getElementById("saajat").value;
+    var omagilvirhe = document.getElementById("omagilvirhe");
+    var laivagilvirhe = document.getElementById("laivagilvirhe");
+    var fcosuusvirhe = document.getElementById("fcosuusvirhe");
+    var saajavirhe = document.getElementById("saajavirhe");
+    var tulos = document.getElementById("fclaivatulos");
+    var gilvirhe = document.getElementById("gilvirhe");
+    //asetetaan virhemuuttujat
+    var virhe = 0;
+    var ogvirhe = "";
+    var lgvirhe = "";
+    var fcvirhe = "";
+    var svirhe = "";
+    var gvirhe = "";
+    //tyhjennetään virheet sivulta
+    omagilvirhe.innerHTML = ogvirhe;
+    laivagilvirhe.innerHTML = lgvirhe;
+    fcosuusvirhe.innerHTML = fcvirhe;
+    saajavirhe.innerHTML = svirhe;
+    gilvirhe.innerHTML = gvirhe;
+    //tarkistetaan kenttien arvojen oikeellisuus, muokataan pilkut tarvittaessa
+    //ja poistetaan tyhjät
+    fcosuus = poistaTyhjatJaMuutaPilkut(fcosuus);
+    omagil = omagil.trim();
+    laivagil = laivagil.trim();
+    saajat = saajat.trim();
+    if(tarkistaPoskokluku(omagil) === 0){
+        virhe = 1;
+        ogvirhe = "Syötä positiivinen kokonaisluku";
+    }
+    if(tarkistaPoskokluku(laivagil) === 0){
+        virhe = 1;
+        lgvirhe = "Syötä positiivinen kokonaisluku";
+    }
+    if(tarkistaPoslukukentta(fcosuus) === 0){
+        virhe = 1;
+        fcvirhe = "Syötä positiivinen luku"
+    }
+    if(tarkistaPoskokluku(saajat) === 0){
+        virhe = 1;
+        svirhe = "Syötä positiivinen kokonaisluku";
+    }
+    //lasketaan gilmäärät tai asetetaan virheet näkyviin jos niitä on
+    if(virhe === 0){
+        var tuotugil = laivagil - omagil;
+    }
+    if(tuotugil <= 0){
+        virhe = 1;
+        gvirhe = "Laiva ei tuonut yhtään giliä";
+    }
+    if(virhe === 0){
+        fcrahat = "Laiva toi " + tuotugil + " giliä.";
+        fclle = (fcosuus/100)*tuotugil;
+        pelaajalle = (((100 - fcosuus)/100)*tuotugil)/saajat;
+        yht = pelaajalle * saajat + fclle;
+        console.log(yht);
+        fclaivatulos.innerHTML = `${fcrahat}, fc:lle menee <b>${fclle}</b> gil ja
+                pelaajille <b>${pelaajalle}</b> gil.`;
+    }
+    else{
+        fclaivatulos.innerHTML = "";
+        omagilvirhe.innerHTML = ogvirhe;
+        laivagilvirhe.innerHTML = lgvirhe;
+        fcosuusvirhe.innerHTML = fcvirhe;
+        saajavirhe.innerHTML = svirhe;
+        gilvirhe.innerHTML = gvirhe;
+    }
+}
+
+//------------------------------------------------------------------------------
+//funktioita
+
+//tarkistetaan positiivisten lukujen kenttä
+function tarkistaPoslukukentta(tark){
+    if(isNaN(tark) || tark === "" || tark <= 0){
+        return 0;
+    }
+    return 1;
+}
+
+//tarkistetaan onko muuttuja melko tarkasti positiivinen kokonaisluku
+function tarkistaPoskokluku(tark){
+    if(isNaN(tark) || parseInt(tark) - parseFloat(tark) != 0 || tark === "" || tark <= 0){
+        return 0;
+    }
+    return 1;
+}
+
+//muutetaan pilkku pisteeksi ja poistetaan tyhjät
+function poistaTyhjatJaMuutaPilkut(muok){
+    muok = muok.replace(",",".");
+    muok = muok.trim();
+    return muok;
 }

@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="fi">
+  <head>
+  {% block title %}FC-laiva gilinjakolaskuri{% endblock %}
+  {% block scripts %}
+  <script src="../static/pokeri.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+  </script>
+  {% endblock %}
+  </head>
+  <body>
+  {% block content %}
+    <div class="fclaiva">
+        <br>
+        <br>
+        <label for="omagil">Omat gilit</label><input type="text" id="omagil"/>
+        <p class="virhe" id="omagilvirhe"></p>
+        <br>
+        <label for="laivagil">Gil laivojen tulojen jälkeen</label>
+        <input type="text" id="laivagil"/>
+        <p class="virhe" id="laivagilvirhe"></p>
+        <br>
+        <label for="fcosuus">FC:n % osuus</label><input type="text" id="fcosuus"
+        value="10"/>
+        <p class="virhe" id="fcosuusvirhe"></p>
+        <br>
+        <label for="saajat">Gilin saajien lukumäärä</label>
+        <input type="text" id="saajat"/>
+        <p class="virhe" id="saajavirhe"></p>
+        <br>
+        <input type="submit" id="laskegilosuudet" value="Laske gil-osuudet"
+        onclick="laskeGil();"/>
+    </div>
+    <br>
+    <div>
+        <p id="fclaivatulos"></p>
+        <p class="virhe" id="gilvirhe"></p>
+    </div>
+  {% endblock %}
+  </body>
+</html>

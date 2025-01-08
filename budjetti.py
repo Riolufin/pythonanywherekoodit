@@ -786,6 +786,16 @@ def pokeridata():
         return redirect(url_for('admin'))
     return render_template('pokeridata.html')
 
+
+#käsitellään FC-laivojen gilinjakolaskuri
+@app.route('/fclaiva', methods=['POST', 'GET'])
+@auth
+def fclaiva():
+    #tarkistetaan onko käyttäjä admin ja jos on, siirrytään admin-sivulle
+    if(session["kayttaja"] == "admin"):
+        return redirect(url_for('admin'))
+    return render_template('fclaiva.html')
+
 if __name__ == '__main__':
     app.debug = True
     app.run(debug=True)

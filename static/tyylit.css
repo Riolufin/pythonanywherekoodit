@@ -171,6 +171,10 @@ a{
     color: black;
 }
 
+.fclaiva input{
+    float: left;
+}
+
 @media only screen and (min-width: 65em){
     body{
         font-size: 100%;
