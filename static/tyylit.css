@@ -175,6 +175,18 @@ a{
     float: left;
 }
 
+.valuutta option{
+    text-align: center;
+}
+
+.pelitiedot input, .pelitiedot select{
+    float: left;
+}
+
+.pelitiedot p{
+    margin: 0;
+}
+
 @media only screen and (min-width: 65em){
     body{
         font-size: 100%;

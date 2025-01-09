@@ -197,24 +197,131 @@ function pokeripanos(){
 
 //käsitellään uuden pelin lisäys
 function lisaaPeli(){
+    //poistetaan nappi jota painettiin
+    var nappi = document.getElementById("lisaauusipeli");
+    nappi.remove();
+    //lisätään sivulle vastauskentät pelin tietoihin
     var lisayspaikka = document.getElementById("lisaapelikentat");
-    lisayspaikka.innerHTML += '<p>Syötä pelin tiedot:<p>';
-    lisayspaikka.innerHTML += `<label for="pelityypit">Pelityyppi</label>
+    lisayspaikka.innerHTML += '<h2>Syötä pelin tiedot:<h2>';
+    lisayspaikka.innerHTML += `<label for="pelityypit">Pelityyppi</label><br>
             <select id="pelityypit">
             <option value="Turnaus">Turnaus</option>
             <option value="Spin &Gold"/>Spin & Gold</option>
             <option value="Mystery Battle Royale"/>Mystery Battle Royale</option>
             <option value="Rush & Cash"/>Rush & Cash</option></select>`;
-    lisayspaikka.innerHTML += `<br><br><label for="tnimi">Nimi</label>
-            <input type="text" id="tnimi"/>`;
+    lisayspaikka.innerHTML += `<br><br><label for="tnimi">Nimi</label><br>
+            <input type="text" id="tnimi"/>
+            <p class="virhe" id="nimivirhe"><br></p>`;
+    lisayspaikka.innerHTML += `<br><label for="pvm">Päivämäärä</label><br>
+            <input type="date" id="pvm"/>
+            <p class="virhe" id="pvmvirhe"><br></p>`;
     lisayspaikka.innerHTML += `<br><br><label for="sisaanosto">Sisäänosto</label>
-            <input type="text" id="sisaanosto"><select id="valuutta">
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="Lippu">Lippu</option></select>`;
-    lisayspaikka.innerHTML += `<br><br><label for="sijoitus">Sijoitus</label>
-            <input type="number" id="sijoitus"/><br><br><label for="osallistujat">
-            Osallistujat</label><input type="number" id="osallistujat"/>`;
+            <br><input type="text" id="sisaanosto">
+            <select class="valuutta" id="svaluutta">
+            <option value="$">$</option>
+            <option value="€">€</option>
+            <option value="C$">C$</option>
+            <option value="T$">T$</option>
+            <option value="Lippu">Lippu</option></select>
+            <p class="virhe" id="ostovirhe"><br></p>`;
+    lisayspaikka.innerHTML += `<br><label for="sijoitus">Sijoitus</label><br>
+            <input type="text" id="sijoitus"/>
+            <p class="virhe" id="sijoitusvirhe"><br></p>
+            <br><label for="osallistujat">
+            Osallistujat</label><br><input type="text" id="osallistujat"/>
+            <p class="virhe" id="osallistujavirhe"><br></p>`;
+    lisayspaikka.innerHTML += `<br><label for="palkinto">Palkintorahat</label>
+            <br><input type="text" id="palkinto"/>
+            <select class="valuutta" id="pvaluutta">
+            <option value="$">$</option>
+            <option value="€">€</option>
+            <option value="C$">C$</option>
+            <option value="T$">T$</option>
+            <option value="Lippu">Lippu</option></select>
+            <p class="virhe" id="palkintovirhe"><br></p>`;
+    lisayspaikka.innerHTML += `<br><input type="submit" value="Tallenna"
+            onclick="tallennaPeli();"/>`;
+}
+
+//käsitellään uuden pelin tallennus
+function tallennaPeli(){
+    //haetaan kenttien arvot
+    var pelityyppi = document.getElementById("pelityypit").value;
+    var nimi = document.getElementById("tnimi").value;
+    var pvm = document.getElementById("pvm").value;
+    var sisaanosto = document.getElementById("sisaanosto").value;
+    var svaluutta = document.getElementById("svaluutta").value;
+    var sijoitus = document.getElementById("sijoitus").value;
+    var osallistujat = document.getElementById("osallistujat").value;
+    var palkinto = document.getElementById("palkinto").value;
+    var pvaluutta = document.getElementById("pvaluutta").value;
+
+    //haetaan virhekentät ja alustetaan virheet
+    var nimivirhe = document.getElementById("nimivirhe");
+    var pvmvirhe = document.getElementById("pvmvirhe");
+    var ostovirhe = document.getElementById("ostovirhe");
+    var sijoitusvirhe = document.getElementById("sijoitusvirhe");
+    var osallistujavirhe = document.getElementById("osallistujavirhe");
+    var palkintovirhe = document.getElementById("palkintovirhe");
+    var virhe = 0;
+    var nvirhe = "<br>";
+    var pvvirhe = "<br>";
+    var ovirhe = "<br>";
+    var sijvirhe = "<br>";
+    var osvirhe = "<br>";
+    var pvirhe = "<br>";
+    //tarkistetaan haettujen arvojen oikeellisuus
+    nimi = nimi.trim();
+    if(nimi === ""){
+        virhe = 1;
+        nvirhe = "Syötä nimi";
+    }
+    if(pvm === ""){
+        virhe = 1;
+        pvvirhe = "Valitse päivämäärä";
+    }
+    sisaanosto = poistaTyhjatJaMuutaPilkut(sisaanosto);
+    if(tarkistaPoslukukentta(sisaanosto) === 0){
+        virhe = 1;
+        ovirhe = "Syötä positiivinen luku";
+    };
+    sijoitus = sijoitus.trim();
+    osallistujat = osallistujat.trim();
+    if(tarkistaPoskokluku(sijoitus) === 0){
+        virhe = 1;
+        sijvirhe = "Syötä positiivinen kokonaisluku";
+    }
+    if(tarkistaPoskokluku(osallistujat) === 0){
+        virhe = 1;
+        osvirhe = "Syötä positiivinen kokonaisluku";
+    }
+    if(sijoitus > osallistujat){
+        virhe = 1;
+        sijvirhe = "Sijoitus ei voi olla suurempi kuin osallistujamäärä";
+        osvirhe = sijvirhe;
+    }
+    palkinto = poistaTyhjatJaMuutaPilkut(palkinto);
+    if(isNaN(palkinto) || palkinto === "" || palkinto < 0){
+        virhe = 1;
+        pvirhe = "Syötä ei-negatiivinen luku";
+    }
+
+    if(virhe != 0){
+        nimivirhe.innerHTML = nvirhe;
+        pvmvirhe.innerHTML = pvvirhe;
+        ostovirhe.innerHTML = ovirhe;
+        sijoitusvirhe.innerHTML = sijvirhe;
+        osallistujavirhe.innerHTML = osvirhe;
+        palkintovirhe.innerHTML = pvirhe;
+    }
+    else{
+        nimivirhe.innerHTML = "<br>";
+        pvmvirhe.innerHTML = "<br>";
+        ostovirhe.innerHTML = "<br>";
+        sijoitusvirhe.innerHTML = "<br>";
+        osallistujavirhe.innerHTML = "<br>";
+        palkintovirhe.innerHTML = "<br>";
+    }
 }
 
 //käsitellään fc-laivojen gilin jakolaskuri
@@ -275,10 +382,8 @@ function laskeGil(){
     }
     if(virhe === 0){
         fcrahat = "Laiva toi " + tuotugil + " giliä.";
-        fclle = (fcosuus/100)*tuotugil;
-        pelaajalle = (((100 - fcosuus)/100)*tuotugil)/saajat;
-        yht = pelaajalle * saajat + fclle;
-        console.log(yht);
+        fclle = parseInt((fcosuus/100)*tuotugil);
+        pelaajalle = parseInt((((100 - fcosuus)/100)*tuotugil)/saajat);
         fclaivatulos.innerHTML = `${fcrahat}, fc:lle menee <b>${fclle}</b> gil ja
                 pelaajille <b>${pelaajalle}</b> gil.`;
     }
