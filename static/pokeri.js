@@ -202,20 +202,20 @@ function lisaaPeli(){
     nappi.remove();
     //lisätään sivulle vastauskentät pelin tietoihin
     var lisayspaikka = document.getElementById("lisaapelikentat");
-    lisayspaikka.innerHTML += '<h2>Syötä pelin tiedot:<h2>';
-    lisayspaikka.innerHTML += `<label for="pelityypit">Pelityyppi</label><br>
-            <select id="pelityypit">
+    lisayspaikka.innerHTML += `<div id="uusipelitietokentat">
+            <h2>Syötä pelin tiedot:</h2><label for="pelityypit">Pelityyppi</label>
+            <br><select id="pelityypit">
             <option value="Turnaus">Turnaus</option>
             <option value="Spin &Gold"/>Spin & Gold</option>
             <option value="Mystery Battle Royale"/>Mystery Battle Royale</option>
-            <option value="Rush & Cash"/>Rush & Cash</option></select>`;
-    lisayspaikka.innerHTML += `<br><br><label for="tnimi">Nimi</label><br>
+            <option value="Rush & Cash"/>Rush & Cash</option></select>
+            <br><br><label for="tnimi">Nimi</label><br>
             <input type="text" id="tnimi"/>
-            <p class="virhe" id="nimivirhe"><br></p>`;
-    lisayspaikka.innerHTML += `<br><label for="pvm">Päivämäärä</label><br>
+            <p class="virhe" id="nimivirhe"><br></p>
+            <br><label for="pvm">Päivämäärä</label><br>
             <input type="date" id="pvm"/>
-            <p class="virhe" id="pvmvirhe"><br></p>`;
-    lisayspaikka.innerHTML += `<br><br><label for="sisaanosto">Sisäänosto</label>
+            <p class="virhe" id="pvmvirhe"><br></p>
+            <br><label for="sisaanosto">Sisäänosto</label>
             <br><input type="text" id="sisaanosto">
             <select class="valuutta" id="svaluutta">
             <option value="$">$</option>
@@ -223,14 +223,14 @@ function lisaaPeli(){
             <option value="C$">C$</option>
             <option value="T$">T$</option>
             <option value="Lippu">Lippu</option></select>
-            <p class="virhe" id="ostovirhe"><br></p>`;
-    lisayspaikka.innerHTML += `<br><label for="sijoitus">Sijoitus</label><br>
+            <p class="virhe" id="ostovirhe"><br></p>
+            <br><label for="sijoitus">Sijoitus</label><br>
             <input type="text" id="sijoitus"/>
             <p class="virhe" id="sijoitusvirhe"><br></p>
             <br><label for="osallistujat">
             Osallistujat</label><br><input type="text" id="osallistujat"/>
-            <p class="virhe" id="osallistujavirhe"><br></p>`;
-    lisayspaikka.innerHTML += `<br><label for="palkinto">Palkintorahat</label>
+            <p class="virhe" id="osallistujavirhe"><br></p>
+            <br><label for="palkinto">Palkintorahat</label>
             <br><input type="text" id="palkinto"/>
             <select class="valuutta" id="pvaluutta">
             <option value="$">$</option>
@@ -238,9 +238,9 @@ function lisaaPeli(){
             <option value="C$">C$</option>
             <option value="T$">T$</option>
             <option value="Lippu">Lippu</option></select>
-            <p class="virhe" id="palkintovirhe"><br></p>`;
-    lisayspaikka.innerHTML += `<br><input type="submit" value="Tallenna"
-            onclick="tallennaPeli();"/>`;
+            <p class="virhe" id="palkintovirhe"><br></p>
+            <br><input type="submit" value="Tallenna"
+            onclick="tallennaPeli();"/></div>`;
 }
 
 //käsitellään uuden pelin tallennus
@@ -281,9 +281,9 @@ function tallennaPeli(){
         pvvirhe = "Valitse päivämäärä";
     }
     sisaanosto = poistaTyhjatJaMuutaPilkut(sisaanosto);
-    if(tarkistaPoslukukentta(sisaanosto) === 0){
+    if(isNaN(sisaanosto) || sisaanosto === "" || sisaanosto < 0){
         virhe = 1;
-        ovirhe = "Syötä positiivinen luku";
+        ovirhe = "Syötä ei-negatiivinen luku";
     };
     sijoitus = sijoitus.trim();
     osallistujat = osallistujat.trim();
@@ -315,13 +315,47 @@ function tallennaPeli(){
         palkintovirhe.innerHTML = pvirhe;
     }
     else{
-        nimivirhe.innerHTML = "<br>";
-        pvmvirhe.innerHTML = "<br>";
-        ostovirhe.innerHTML = "<br>";
-        sijoitusvirhe.innerHTML = "<br>";
-        osallistujavirhe.innerHTML = "<br>";
-        palkintovirhe.innerHTML = "<br>";
+        var uusipelitietokentat = document.getElementById("uusipelitietokentat");
+        uusipelitietokentat.remove();
+        var uusipelicont = document.getElementById("uusipelicontainer");
+        uusipelicont.innerHTML += `<h3>Peli lisätty onnistuneesti</h3>
+        <input type="submit" name="pelilisattynappi"
+        id="pelilisatty" value="OK" onclick="peliLisatty();"/>`;
+        //pythonilla käsiteltäväksi vietävät tiedot
+        var server_data = [
+            {
+                "pelityyppi": pelityyppi,
+                "nimi": nimi,
+                "pvm": pvm,
+                "sisaanosto": sisaanosto,
+                "svaluutta": svaluutta,
+                "sijoitus": sijoitus,
+                "osallistujat": osallistujat,
+                "palkinto": palkinto,
+                "pvaluutta": pvaluutta
+            }
+            ];
+        //tehdään ajax-kutsu
+        $.ajax({
+            type: "POST",
+            url: "/poskeridata",
+            data: JSON.stringify(server_data),
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(data) {
+                console.log("Result:");
+                console.log(data);
+        }
+        });
     }
+}
+
+//Käsitellään pelin lisäyksen onnistumisen jälkitoimet
+function peliLisatty(){
+    var uusipelicont = document.getElementById("uusipelicontainer");
+    uusipelicont.innerHTML = `<input type="submit" name="uusipelinappi"
+        id="lisaauusipeli" value="Lisää uusi peli" onclick="lisaaPeli();"/>
+        <div id="lisaapelikentat" class="pelitiedot"></div>`;
 }
 
 //käsitellään fc-laivojen gilin jakolaskuri

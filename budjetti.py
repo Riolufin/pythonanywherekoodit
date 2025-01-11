@@ -10,14 +10,14 @@ from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.secret_key = '###'
+app.secret_key = 'xxx'
 
 #valmistellaan tietokantayhteys
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
-    username="###",
-    password="###",
-    hostname="###",
-    databasename="###",
+    username="xxx",
+    password="xxx",
+    hostname="xxx",
+    databasename="xxx",
 )
 app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
@@ -46,6 +46,22 @@ class Tunnukset(tietokanta.Model):
     salasana = tietokanta.Column(tietokanta.String(4096))
     email = tietokanta.Column(tietokanta.String(4096))
 
+#pokeripelit tietokanta
+class Pokeripelit(tietokanta.Model):
+
+    __tablename__ = "pokeripelit"
+
+    pelityyppi = tietokanta.Column(tietokanta.String(255))
+    nimi = tietokanta.Column(tietokanta.String(255))
+    paivamaara = tietokanta.Column(tietokanta.Date)
+    sisaanosto = tietokanta.Column(tietokanta.Float(20, 2))
+    ostovaluutta = tietokanta.Column(tietokanta.String(255))
+    sijoitus = tietokanta.Column(tietokanta.Integer)
+    osallistujat = tietokanta.Column(tietokanta.Integer)
+    palkintorahat = tietokanta.Column(tietokanta.Float(20, 2))
+    palkintovaluutta = tietokanta.Column(tietokanta.String(255))
+    tunnus = tietokanta.Column(tietokanta.String(4096))
+    id = tietokanta.Column(tietokanta.Integer, primary_key=True)
 
 def auth(f):
     ''' Tämä decorator hoitaa kirjautumisen tarkistamisen ja ohjaa
@@ -772,7 +788,20 @@ def poskeridatajutut():
         return redirect(url_for('admin'))
     if request.method == "POST":
         pokeritiedot = request.get_json()
-        print(pokeritiedot)
+        pokeritietodict = pokeritiedot[0]
+        #lisätään peli tietokantaan
+        lisaapeli = tietokanta.insert(Pokeripelit).values(
+            pelityyppi = pokeritietodict["pelityyppi"],
+            nimi = pokeritietodict["nimi"], paivamaara = pokeritietodict["pvm"],
+            sisaanosto = pokeritietodict["sisaanosto"],
+            ostovaluutta = pokeritietodict["svaluutta"],
+            sijoitus = pokeritietodict["sijoitus"],
+            osallistujat = pokeritietodict["osallistujat"],
+            palkintorahat = pokeritietodict["palkinto"],
+            palkintovaluutta = pokeritietodict["pvaluutta"],
+            tunnus = session["kayttaja"])
+        with tietokanta.engine.connect() as yhteys:
+            yhteys.execute(lisaapeli)
         return jsonify(pokeritiedot)
     return redirect('pokeridata')
 
