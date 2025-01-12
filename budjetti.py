@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #author Jiri Lahtinen
-#version 14.9.2024
+#version 12.1.2025
 
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 import hashlib
@@ -813,7 +813,43 @@ def pokeridata():
     #tarkistetaan onko käyttäjä admin ja jos on, siirrytään admin-sivulle
     if(session["kayttaja"] == "admin"):
         return redirect(url_for('admin'))
-    return render_template('pokeridata.html')
+
+    #haetaan käyttäjän tiedot tietokannasta
+    palkintotiedot = []
+    palkintorahat = []
+    palkintodollarit = []
+    palkintocdollarit = []
+    palkintotdollarit = []
+    palkintoeurot = []
+    palkintoliput = []
+    rahatiedot = tietokanta.select(Pokeripelit.palkintorahat, Pokeripelit.palkintovaluutta,
+                    Pokeripelit.pelityyppi, Pokeripelit.nimi,
+                    Pokeripelit.paivamaara, Pokeripelit.sisaanosto,
+                    Pokeripelit.ostovaluutta, Pokeripelit.sijoitus,
+                    Pokeripelit.osallistujat).where(Pokeripelit.tunnus == session["kayttaja"])
+    with tietokanta.engine.connect() as yhteys:
+        for rivi in yhteys.execute(rahatiedot):
+            palkintotiedot.append(rivi)
+    for i in palkintotiedot:
+        palkintorahat.append(i[0])
+        if(i[1] == "$"):
+            palkintodollarit.append(i[0])
+        elif(i[1] == "C$"):
+            palkintocdollarit.append(i[0])
+        elif(i[1] == "T$"):
+            palkintotdollarit.append(i[0])
+        elif(i[1] == "€"):
+            palkintoeurot.append(i[0])
+        else:
+            palkintoliput.append(i[0])
+
+    rahat = {"palkintorahat": round(sum(palkintorahat), 2)}
+    palkinnot = {"$": round(sum(palkintodollarit), 2),
+                "C$": round(sum(palkintocdollarit), 2),
+                "T$": round(sum(palkintotdollarit), 2),
+                "€": round(sum(palkintoeurot), 2),
+                "liput": round(sum(palkintoliput), 2)}
+    return render_template('pokeridata.html', rahat=rahat, palkinnot=palkinnot)
 
 
 #käsitellään FC-laivojen gilinjakolaskuri

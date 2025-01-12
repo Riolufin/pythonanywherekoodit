@@ -206,12 +206,11 @@ function lisaaPeli(){
             <h2>Syötä pelin tiedot:</h2><label for="pelityypit">Pelityyppi</label>
             <br><select id="pelityypit">
             <option value="Turnaus">Turnaus</option>
-            <option value="Spin &Gold"/>Spin & Gold</option>
+            <option value="Spin & Gold"/>Spin & Gold</option>
             <option value="Mystery Battle Royale"/>Mystery Battle Royale</option>
             <option value="Rush & Cash"/>Rush & Cash</option></select>
             <br><br><label for="tnimi">Nimi</label><br>
-            <input type="text" id="tnimi"/>
-            <p class="virhe" id="nimivirhe"><br></p>
+            <input type="text" id="tnimi"/><br>
             <br><label for="pvm">Päivämäärä</label><br>
             <input type="date" id="pvm"/>
             <p class="virhe" id="pvmvirhe"><br></p>
@@ -240,7 +239,9 @@ function lisaaPeli(){
             <option value="Lippu">Lippu</option></select>
             <p class="virhe" id="palkintovirhe"><br></p>
             <br><input type="submit" value="Tallenna"
-            onclick="tallennaPeli();"/></div>`;
+            onclick="tallennaPeli();"/><br><br><br>
+            <input type="submit" value="Takaisin"
+            onclick="peliLisatty();"/></div>`;
 }
 
 //käsitellään uuden pelin tallennus
@@ -257,14 +258,12 @@ function tallennaPeli(){
     var pvaluutta = document.getElementById("pvaluutta").value;
 
     //haetaan virhekentät ja alustetaan virheet
-    var nimivirhe = document.getElementById("nimivirhe");
     var pvmvirhe = document.getElementById("pvmvirhe");
     var ostovirhe = document.getElementById("ostovirhe");
     var sijoitusvirhe = document.getElementById("sijoitusvirhe");
     var osallistujavirhe = document.getElementById("osallistujavirhe");
     var palkintovirhe = document.getElementById("palkintovirhe");
     var virhe = 0;
-    var nvirhe = "<br>";
     var pvvirhe = "<br>";
     var ovirhe = "<br>";
     var sijvirhe = "<br>";
@@ -272,10 +271,6 @@ function tallennaPeli(){
     var pvirhe = "<br>";
     //tarkistetaan haettujen arvojen oikeellisuus
     nimi = nimi.trim();
-    if(nimi === ""){
-        virhe = 1;
-        nvirhe = "Syötä nimi";
-    }
     if(pvm === ""){
         virhe = 1;
         pvvirhe = "Valitse päivämäärä";
@@ -287,15 +282,17 @@ function tallennaPeli(){
     };
     sijoitus = sijoitus.trim();
     osallistujat = osallistujat.trim();
-    if(tarkistaPoskokluku(sijoitus) === 0){
+    if(tarkistaPoskokluku(sijoitus) === 0 && pelityyppi != "Rush & Cash"){
         virhe = 1;
         sijvirhe = "Syötä positiivinen kokonaisluku";
     }
-    if(tarkistaPoskokluku(osallistujat) === 0){
+    if(tarkistaPoskokluku(osallistujat) === 0 && pelityyppi != "Rush & Cash"){
         virhe = 1;
         osvirhe = "Syötä positiivinen kokonaisluku";
     }
-    if(sijoitus > osallistujat){
+    console.log(sijoitus);
+    console.log(osallistujat);
+    if(parseInt(sijoitus) > parseInt(osallistujat) && pelityyppi != "Rush & Cash"){
         virhe = 1;
         sijvirhe = "Sijoitus ei voi olla suurempi kuin osallistujamäärä";
         osvirhe = sijvirhe;
@@ -307,7 +304,6 @@ function tallennaPeli(){
     }
 
     if(virhe != 0){
-        nimivirhe.innerHTML = nvirhe;
         pvmvirhe.innerHTML = pvvirhe;
         ostovirhe.innerHTML = ovirhe;
         sijoitusvirhe.innerHTML = sijvirhe;

@@ -11,6 +11,14 @@
   <body>
   {% block content %}
     <div class="datadivi">
+        <p>
+            {% for key, value in palkinnot.items() %}
+                {% if value > 0 %}
+                    Palkinto {{ key }} yhteensä: <b>{{ value }}</b><br>
+                {% endif %}
+            {% endfor %}
+        </p>
+        <p>Kaikki palkinnot yhteensä: <b>{{ rahat["palkintorahat"] }}</b></p>
     </div>
     <div class="uusipeli" id="uusipelicontainer">
         <input type="submit" name="uusipelinappi" id="lisaauusipeli"
