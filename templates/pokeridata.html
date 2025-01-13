@@ -11,6 +11,22 @@
   <body>
   {% block content %}
     <div class="datadivi">
+        <h3 id="valittudataotsikko">Kokonaistiedot</h3>
+        <p>Valitse näytettävät tiedot:</p>
+        <div id="tietovalinta" class="tietovalinta">
+            <label for="naytatyyppi">Pelityyppi: <select id="naytatyyppi">
+                {% for tyyppi in pelityypit %}
+                    <option value="{{ tyyppi }}">{{ tyyppi }}</option>
+                {% endfor %}
+            </select></label>
+            <label for="naytanimi">Nimi: <select id="naytanimi">
+                {% for nimi in nimet %}
+                    <option value="{{ nimi }}">{{ nimi }}</option>
+                {% endfor %}
+            </select></label>
+            <label for="alkupvm">Ajanjakso: <input type="date" id="alkupvm"/>
+            <label for="loppupvm">-<input type="date" id="loppupvm"/></label></label>
+        </div>
         <p>
             {% for key, value in palkinnot.items() %}
                 {% if value > 0 %}
@@ -19,6 +35,16 @@
             {% endfor %}
         </p>
         <p>Kaikki palkinnot yhteensä: <b>{{ rahat["palkintorahat"] }}</b></p>
+        <p>Näytä kaikki pelit tietoineen: <input type="submit" value="Näytä" id="naytanappi" onclick="naytaKaikki();"/></p>
+        <ul hidden="hidden" id="kaikkitiedot">
+            {% for key, value in tiedot.items() %}
+            <li>Peli<ul>
+                {% for i, j in value.items() %}
+                <li>{{ i }}: {{ j }}</li>
+                {% endfor %}
+            </ul></li>
+            {% endfor %}
+        </ul>
     </div>
     <div class="uusipeli" id="uusipelicontainer">
         <input type="submit" name="uusipelinappi" id="lisaauusipeli"

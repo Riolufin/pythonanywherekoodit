@@ -187,6 +187,13 @@ a{
     margin: 0;
 }
 
+.tietovalinta{
+    display: flex;
+    justify-content: space-evenly;
+    height: 1.2em;
+    width: 100%;
+}
+
 @media only screen and (min-width: 65em){
     body{
         font-size: 100%;

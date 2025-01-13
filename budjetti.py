@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #author Jiri Lahtinen
-#version 12.1.2025
+#version 13.1.2025
 
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 import hashlib
@@ -816,40 +816,66 @@ def pokeridata():
 
     #haetaan käyttäjän tiedot tietokannasta
     palkintotiedot = []
-    palkintorahat = []
-    palkintodollarit = []
-    palkintocdollarit = []
-    palkintotdollarit = []
-    palkintoeurot = []
-    palkintoliput = []
-    rahatiedot = tietokanta.select(Pokeripelit.palkintorahat, Pokeripelit.palkintovaluutta,
-                    Pokeripelit.pelityyppi, Pokeripelit.nimi,
-                    Pokeripelit.paivamaara, Pokeripelit.sisaanosto,
-                    Pokeripelit.ostovaluutta, Pokeripelit.sijoitus,
-                    Pokeripelit.osallistujat).where(Pokeripelit.tunnus == session["kayttaja"])
+    palkintorahat = 0
+    palkintodollarit = 0
+    palkintocdollarit = 0
+    palkintotdollarit = 0
+    palkintoeurot = 0
+    palkintoliput = 0
+    uniikittyypit = dict()
+    uniikitnimet = dict()
+    tiedot = dict()
+    rahatiedot = tietokanta.select(Pokeripelit.palkintorahat,
+                    Pokeripelit.palkintovaluutta, Pokeripelit.pelityyppi,
+                    Pokeripelit.nimi, Pokeripelit.paivamaara,
+                    Pokeripelit.sisaanosto, Pokeripelit.ostovaluutta,
+                    Pokeripelit.sijoitus, Pokeripelit.osallistujat,
+                    Pokeripelit.id).where(Pokeripelit.tunnus == session["kayttaja"])
     with tietokanta.engine.connect() as yhteys:
         for rivi in yhteys.execute(rahatiedot):
             palkintotiedot.append(rivi)
     for i in palkintotiedot:
-        palkintorahat.append(i[0])
-        if(i[1] == "$"):
-            palkintodollarit.append(i[0])
-        elif(i[1] == "C$"):
-            palkintocdollarit.append(i[0])
-        elif(i[1] == "T$"):
-            palkintotdollarit.append(i[0])
-        elif(i[1] == "€"):
-            palkintoeurot.append(i[0])
-        else:
-            palkintoliput.append(i[0])
+        uniikittyypit.update({i[2]: ""})
+        uniikitnimet.update({i[3]: ""})
+        tiedot.update({i[9]:{
+                            "Pelityyppi": i[2],
+                            "Nimi": i[3],
+                            "Päivämäärä": i[4],
+                            "Sisäänosto": i[5],
+                            "Ostovaluutta": i[6],
+                            "Sijoitus": i[7],
+                            "Osallistujat": i[8],
+                            "Palkintorahat": i[0],
+                            "Palkintovaluutta": i[1]
+                            }})
 
-    rahat = {"palkintorahat": round(sum(palkintorahat), 2)}
-    palkinnot = {"$": round(sum(palkintodollarit), 2),
-                "C$": round(sum(palkintocdollarit), 2),
-                "T$": round(sum(palkintotdollarit), 2),
-                "€": round(sum(palkintoeurot), 2),
-                "liput": round(sum(palkintoliput), 2)}
-    return render_template('pokeridata.html', rahat=rahat, palkinnot=palkinnot)
+    try:
+        del uniikitnimet[""]
+        del uniikittyypit[""]
+    except:
+        print("tuhottavaa ei löytynyt")
+    for i, j in tiedot.items():
+        j["Sisäänosto"] = round(j["Sisäänosto"], 2)
+        j["Palkintorahat"] = round(j["Palkintorahat"], 2)
+        if(j["Palkintovaluutta"] == "$"):
+            palkintodollarit += j["Palkintorahat"]
+        elif(j["Palkintovaluutta"] == "C$"):
+            palkintocdollarit += j["Palkintorahat"]
+        elif(j["Palkintovaluutta"] == "T$"):
+            palkintotdollarit += j["Palkintorahat"]
+        elif(j["Palkintovaluutta"] == "€"):
+            palkintoeurot += j["Palkintorahat"]
+        elif(j["Palkintovaluutta"] == "Lippu"):
+            palkintoliput += j["Palkintorahat"]
+        palkintorahat += j["Palkintorahat"]
+
+    rahat = {"palkintorahat": palkintorahat}
+    palkinnot = {"$": palkintodollarit,
+                "C$": palkintocdollarit,
+                "T$": palkintotdollarit,
+                "€": palkintoeurot,
+                "liput": palkintoliput}
+    return render_template('pokeridata.html', rahat=rahat, palkinnot=palkinnot, pelityypit=sorted(uniikittyypit), nimet=sorted(uniikitnimet), tiedot=tiedot)
 
 
 #käsitellään FC-laivojen gilinjakolaskuri

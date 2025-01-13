@@ -427,6 +427,24 @@ function laskeGil(){
     }
 }
 
+//Näytetään kaikki pelit tietoineen kun painetaan nappia
+function naytaKaikki(){
+    var nayta = document.getElementById("kaikkitiedot");
+    var naytanappi = document.getElementById("naytanappi");
+    naytanappi.setAttribute("value", "Piilota");
+    naytanappi.setAttribute("onclick", "piilotaKaikki();");
+    nayta.removeAttribute("Hidden");
+}
+
+//Piilotetaan kaikki pelit tietoineen kun painetaan nappia
+function piilotaKaikki(){
+    var nayta = document.getElementById("kaikkitiedot");
+    var naytanappi = document.getElementById("naytanappi");
+    naytanappi.setAttribute("value", "Näytä");
+    naytanappi.setAttribute("onclick", "naytaKaikki();");
+    nayta.setAttribute("hidden", "hidden");
+}
+
 //------------------------------------------------------------------------------
 //funktioita
 
