@@ -11,22 +11,47 @@
   <body>
   {% block content %}
     <div class="datadivi">
-        <h3 id="valittudataotsikko">Kokonaistiedot</h3>
-        <p>Valitse näytettävät tiedot:</p>
+        <h3 id="valittudataotsikko">Valitse näytettävät tiedot:</h3>
+        <div id="tietovalintatausta">
         <div id="tietovalinta" class="tietovalinta">
-            <label for="naytatyyppi">Pelityyppi: <select id="naytatyyppi">
+            <label for="naytatyyppi"><b>Pelityyppi: </b><select id="naytatyyppi">
+                <option value="Kaikki">Kaikki</option>
                 {% for tyyppi in pelityypit %}
                     <option value="{{ tyyppi }}">{{ tyyppi }}</option>
                 {% endfor %}
             </select></label>
-            <label for="naytanimi">Nimi: <select id="naytanimi">
+            <label for="naytanimi"><b>Nimi: </b><select id="naytanimi">
+                <option value="Kaikki">Kaikki</option>
                 {% for nimi in nimet %}
                     <option value="{{ nimi }}">{{ nimi }}</option>
                 {% endfor %}
             </select></label>
-            <label for="alkupvm">Ajanjakso: <input type="date" id="alkupvm"/>
+            <label for="alkupvm"><b>Ajanjakso: </b><input type="date" id="alkupvm"/>
             <label for="loppupvm">-<input type="date" id="loppupvm"/></label></label>
+            <label for="naytasisaanosto"><b>Sisäänosto: </b><select id="naytasisaanosto">
+                <option value="Kaikki">Kaikki</option>
+                {% for osto in ostot %}
+                    <option value="{{ osto }}">{{ osto }}</option>
+                {% endfor %}
+            </select>
+            <select id="naytaostovaluutta">
+                <option value="Kaikki">Kaikki</option>
+                {% for ovaluutta in ostovaluutat %}
+                    <option value="{{ ovaluutta }}">{{ ovaluutta }}</option>
+                {% endfor %}
+            </select><b>valuutassa</b></label>
+            <label for="naytavoitot"><b>Näytä vain voittoisat pelit: </b>
+            <input type="checkbox" id="naytavoitot"/>
+            <select id="naytavoitotvaluutta">
+                <option value="Kaikki">Kaikki</option>
+                {% for pvaluutta in palkintovaluutat %}
+                    <option value="{{ pvaluutta }}">{{ pvaluutta }}</option>
+                {% endfor %}
+            </select><b>valuutassa</b></label>
+            <button id="naytatiedotnappi" value="nayta" onclick="naytaTiedot();">Näytä</button>
         </div>
+        </div>
+        <h2>Näytetään näytettävät tiedot</h2>
         <p>
             {% for key, value in palkinnot.items() %}
                 {% if value > 0 %}

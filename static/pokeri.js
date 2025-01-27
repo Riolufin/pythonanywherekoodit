@@ -106,25 +106,6 @@ function pokeri() {
         maksuvirhe.innerHTML = mvirhe;
         tulos.innerHTML = "";
     }
-
-    //pythonilla käsiteltäväksi vietävät tiedot
-    var server_data = [
-    {
-    "pottikentta": pottikentta
-    }
-    ];
-    //tehdään ajax-kutsu
-    $.ajax({
-        type: "POST",
-        url: "/poskeri",
-        data: JSON.stringify(server_data),
-        contentType: "application/json",
-        dataType: 'json',
-        success: function(poskerijutut) {
-            console.log("Result:");
-            console.log(poskerijutut);
-        }
-    });
 }
 
 //käsitellään panoskokolaskurin toiminta
@@ -175,24 +156,20 @@ function pokeripanos(){
         pottivirhe.innerHTML = pvirhe;
         maksuvirhe.innerHTML = ""
     }
-    //pythonilla käsiteltäväksi vietävät tiedot
-    var server_data = [
-    {
-    "pottikentta": pottikentta
-    }
-    ];
-    //tehdään ajax-kutsu
-    $.ajax({
-        type: "POST",
-        url: "/poskeri",
-        data: JSON.stringify(server_data),
-        contentType: "application/json",
-        dataType: 'json',
-        success: function(result) {
-            console.log("Result:");
-            console.log(result);
-        }
-    });
+}
+
+//Käsitellään valitun pokeridatan näyttäminen
+function naytaTiedot(){
+    //haetaan valitut tiedot html-elementeistä
+    var pelityyppi = document.getElementById("naytatyyppi").value;
+    var nimi = document.getElementById("naytanimi").value;
+    var alkupvm = document.getElementById("alkupvm").value;
+    var loppupvm = document.getElementById("loppupvm").value;
+    var sisaanosto = document.getElementById("naytasisaanosto").value;
+    var ostovaluutta = document.getElementById("naytaostovaluutta").value;
+    var palkinto = document.getElementById("naytavoitot").checked;
+    var palkintovaluutta = document.getElementById("naytavoitotvaluutta").value;
+    console.log(pelityyppi, nimi, alkupvm ,loppupvm, sisaanosto, ostovaluutta, palkinto, palkintovaluutta);
 }
 
 //käsitellään uuden pelin lisäys
@@ -346,12 +323,10 @@ function tallennaPeli(){
     }
 }
 
-//Käsitellään pelin lisäyksen onnistumisen jälkitoimet
+//Päivitetään sivu pelin lisäämisen onnistuttua
 function peliLisatty(){
-    var uusipelicont = document.getElementById("uusipelicontainer");
-    uusipelicont.innerHTML = `<input type="submit" name="uusipelinappi"
-        id="lisaauusipeli" value="Lisää uusi peli" onclick="lisaaPeli();"/>
-        <div id="lisaapelikentat" class="pelitiedot"></div>`;
+    location.reload();
+    return false;
 }
 
 //käsitellään fc-laivojen gilin jakolaskuri

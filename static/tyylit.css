@@ -187,11 +187,24 @@ a{
     margin: 0;
 }
 
+#valittudataotsikko{
+    height: 1.5em;
+    padding-top: 0.5em;
+}
+
+#tietovalintatausta{
+    height: 1.6em;
+    padding-top: 0.4em;
+    background: cyan;
+}
+
 .tietovalinta{
     display: flex;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     height: 1.2em;
     width: 100%;
+    align-items: center;
+    column-gap: 1em;
 }
 
 @media only screen and (min-width: 65em){

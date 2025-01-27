@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #author Jiri Lahtinen
-#version 13.1.2025
+#version 27.1.2025
 
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 import hashlib
@@ -824,6 +824,9 @@ def pokeridata():
     palkintoliput = 0
     uniikittyypit = dict()
     uniikitnimet = dict()
+    uniikitostot = dict()
+    uniikitostovaluutat = dict()
+    uniikitpalkintovaluutat = dict()
     tiedot = dict()
     rahatiedot = tietokanta.select(Pokeripelit.palkintorahat,
                     Pokeripelit.palkintovaluutta, Pokeripelit.pelityyppi,
@@ -837,6 +840,10 @@ def pokeridata():
     for i in palkintotiedot:
         uniikittyypit.update({i[2]: ""})
         uniikitnimet.update({i[3]: ""})
+        uniikkiosto = round(float(i[5]), 2)
+        uniikitostot.update({uniikkiosto: ""})
+        uniikitostovaluutat.update({i[6]: ""})
+        uniikitpalkintovaluutat.update({i[6]: ""})
         tiedot.update({i[9]:{
                             "Pelityyppi": i[2],
                             "Nimi": i[3],
@@ -852,6 +859,8 @@ def pokeridata():
     try:
         del uniikitnimet[""]
         del uniikittyypit[""]
+        del uniikitostot[""]
+        del uniikitostovaluutat[""]
     except:
         print("tuhottavaa ei löytynyt")
     for i, j in tiedot.items():
@@ -875,7 +884,10 @@ def pokeridata():
                 "T$": palkintotdollarit,
                 "€": palkintoeurot,
                 "liput": palkintoliput}
-    return render_template('pokeridata.html', rahat=rahat, palkinnot=palkinnot, pelityypit=sorted(uniikittyypit), nimet=sorted(uniikitnimet), tiedot=tiedot)
+    return render_template('pokeridata.html', rahat=rahat, palkinnot=palkinnot,
+    pelityypit=sorted(uniikittyypit), nimet=sorted(uniikitnimet),
+    ostot=sorted(uniikitostot), ostovaluutat=sorted(uniikitostovaluutat),
+    palkintovaluutat=sorted(uniikitpalkintovaluutat), tiedot=tiedot)
 
 
 #käsitellään FC-laivojen gilinjakolaskuri
