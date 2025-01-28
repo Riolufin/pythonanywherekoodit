@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #author Jiri Lahtinen
-#version 27.1.2025
+#version 28.1.2025
 
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 import hashlib
@@ -763,10 +763,7 @@ def poskerijutut():
     #tarkistetaan onko käyttäjä admin ja jos on, siirrytään admin-sivulle
     if(session["kayttaja"] == "admin"):
         return redirect(url_for('admin'))
-    if request.method == "POST":
-        pokeritiedot = request.get_json()
-        print(pokeritiedot)
-        return jsonify(pokeritiedot)
+
     return redirect('pokeri')
 
 
@@ -786,23 +783,67 @@ def poskeridatajutut():
     #tarkistetaan onko käyttäjä admin ja jos on, siirrytään admin-sivulle
     if(session["kayttaja"] == "admin"):
         return redirect(url_for('admin'))
+    #käsitellään kaikki POST-pyynnöt
     if request.method == "POST":
         pokeritiedot = request.get_json()
         pokeritietodict = pokeritiedot[0]
-        #lisätään peli tietokantaan
-        lisaapeli = tietokanta.insert(Pokeripelit).values(
-            pelityyppi = pokeritietodict["pelityyppi"],
-            nimi = pokeritietodict["nimi"], paivamaara = pokeritietodict["pvm"],
-            sisaanosto = pokeritietodict["sisaanosto"],
-            ostovaluutta = pokeritietodict["svaluutta"],
-            sijoitus = pokeritietodict["sijoitus"],
-            osallistujat = pokeritietodict["osallistujat"],
-            palkintorahat = pokeritietodict["palkinto"],
-            palkintovaluutta = pokeritietodict["pvaluutta"],
-            tunnus = session["kayttaja"])
-        with tietokanta.engine.connect() as yhteys:
-            yhteys.execute(lisaapeli)
-        return jsonify(pokeritiedot)
+        #haetaan tietokannasta pyydetyt tiedot jos painettu nappi oli naytatiedotnappi
+        if(pokeritietodict["nappi"] == "naytatiedot"):
+            for key in pokeritietodict:
+                if(pokeritietodict[key] == "Kaikki"):
+                    pokeritietodict[key] = "%%"
+            kantatiedot = []
+            tiedot = dict()
+            haetuttiedot = tietokanta.select(Pokeripelit.palkintorahat,
+                            Pokeripelit.palkintovaluutta, Pokeripelit.pelityyppi,
+                            Pokeripelit.nimi, Pokeripelit.paivamaara,
+                            Pokeripelit.sisaanosto, Pokeripelit.ostovaluutta,
+                            Pokeripelit.sijoitus, Pokeripelit.osallistujat,
+                            Pokeripelit.id).where(
+                                Pokeripelit.tunnus == session["kayttaja"]
+                                ).where(
+                                    Pokeripelit.pelityyppi.like(pokeritietodict["pelityyppi"])
+                                    ).where(
+                                    Pokeripelit.nimi.like(pokeritietodict["nimi"])
+                                    ).where(
+                                    Pokeripelit.sisaanosto.like(pokeritietodict["sisaanosto"] + '%')
+                                    ).where(
+                                    Pokeripelit.ostovaluutta.like(pokeritietodict["ostovaluutta"])
+                                    ).where(
+                                    Pokeripelit.palkintovaluutta.like(pokeritietodict["palkintovaluutta"]))
+            with tietokanta.engine.connect() as yhteys:
+                for rivi in yhteys.execute(haetuttiedot):
+                    kantatiedot.append(rivi)
+            for i in kantatiedot:
+                tiedot.update({i[9]:{
+                            "Pelityyppi": i[2],
+                            "Nimi": i[3],
+                            "Päivämäärä": i[4],
+                            "Sisäänosto": i[5],
+                            "Ostovaluutta": i[6],
+                            "Sijoitus": i[7],
+                            "Osallistujat": i[8],
+                            "Palkintorahat": i[0],
+                            "Palkintovaluutta": i[1]
+                            }})
+            print(tiedot)
+            return jsonify(tiedot)
+
+        #lisätään peli tietokantaan jos painettu nappi oli uuden pelin tallennus
+        if(pokeritietodict["nappi"] == "tallennapeli"):
+            lisaapeli = tietokanta.insert(Pokeripelit).values(
+                pelityyppi = pokeritietodict["pelityyppi"],
+                nimi = pokeritietodict["nimi"], paivamaara = pokeritietodict["pvm"],
+                sisaanosto = pokeritietodict["sisaanosto"],
+                ostovaluutta = pokeritietodict["svaluutta"],
+                sijoitus = pokeritietodict["sijoitus"],
+                osallistujat = pokeritietodict["osallistujat"],
+                palkintorahat = pokeritietodict["palkinto"],
+                palkintovaluutta = pokeritietodict["pvaluutta"],
+                tunnus = session["kayttaja"])
+            with tietokanta.engine.connect() as yhteys:
+                yhteys.execute(lisaapeli)
+
     return redirect('pokeridata')
 
 
@@ -840,7 +881,7 @@ def pokeridata():
     for i in palkintotiedot:
         uniikittyypit.update({i[2]: ""})
         uniikitnimet.update({i[3]: ""})
-        uniikkiosto = round(float(i[5]), 2)
+        uniikkiosto = format(round(float(i[5]), 2), '.2f')
         uniikitostot.update({uniikkiosto: ""})
         uniikitostovaluutat.update({i[6]: ""})
         uniikitpalkintovaluutat.update({i[6]: ""})
@@ -855,12 +896,9 @@ def pokeridata():
                             "Palkintorahat": i[0],
                             "Palkintovaluutta": i[1]
                             }})
-
+    #poistetaan mahdolliset tyhjät
     try:
         del uniikitnimet[""]
-        del uniikittyypit[""]
-        del uniikitostot[""]
-        del uniikitostovaluutat[""]
     except:
         print("tuhottavaa ei löytynyt")
     for i, j in tiedot.items():

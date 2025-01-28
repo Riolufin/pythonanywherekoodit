@@ -169,7 +169,32 @@ function naytaTiedot(){
     var ostovaluutta = document.getElementById("naytaostovaluutta").value;
     var palkinto = document.getElementById("naytavoitot").checked;
     var palkintovaluutta = document.getElementById("naytavoitotvaluutta").value;
-    console.log(pelityyppi, nimi, alkupvm ,loppupvm, sisaanosto, ostovaluutta, palkinto, palkintovaluutta);
+
+    //pythonilla käsiteltäväksi vietävät tiedot
+    var server_data = [
+        {
+            "nappi": "naytatiedot",
+            "pelityyppi": pelityyppi,
+            "nimi": nimi,
+            "alkupvm": alkupvm,
+            "loppupvm": loppupvm,
+            "sisaanosto": sisaanosto,
+            "ostovaluutta": ostovaluutta,
+            "palkinto": palkinto,
+            "palkintovaluutta": palkintovaluutta
+        }
+        ];
+    //tehdään ajax-kutsu
+    $.ajax({
+        type: "POST",
+        url: "/poskeridata",
+        data: JSON.stringify(server_data),
+        contentType: "application/json",
+        dataType: 'json',
+        success: function(paskaa){
+            console.log(paskaa);
+        }
+    });
 }
 
 //käsitellään uuden pelin lisäys
@@ -177,7 +202,7 @@ function lisaaPeli(){
     //poistetaan nappi jota painettiin
     var nappi = document.getElementById("lisaauusipeli");
     nappi.remove();
-    //lisätään sivulle vastauskentät pelin tietoihin
+    //lisätään sivulle vastauskentät pelin tietoihin sekä peruutusnappi
     var lisayspaikka = document.getElementById("lisaapelikentat");
     lisayspaikka.innerHTML += `<div id="uusipelitietokentat">
             <h2>Syötä pelin tiedot:</h2><label for="pelityypit">Pelityyppi</label>
@@ -217,7 +242,7 @@ function lisaaPeli(){
             <p class="virhe" id="palkintovirhe"><br></p>
             <br><input type="submit" value="Tallenna"
             onclick="tallennaPeli();"/><br><br><br>
-            <input type="submit" value="Takaisin"
+            <input type="submit" value="Peruuta"
             onclick="peliLisatty();"/></div>`;
 }
 
@@ -267,8 +292,6 @@ function tallennaPeli(){
         virhe = 1;
         osvirhe = "Syötä positiivinen kokonaisluku";
     }
-    console.log(sijoitus);
-    console.log(osallistujat);
     if(parseInt(sijoitus) > parseInt(osallistujat) && pelityyppi != "Rush & Cash"){
         virhe = 1;
         sijvirhe = "Sijoitus ei voi olla suurempi kuin osallistujamäärä";
@@ -280,13 +303,14 @@ function tallennaPeli(){
         pvirhe = "Syötä ei-negatiivinen luku";
     }
 
+    //jos on virhe, asetetaan virheilmoitukset virheelementteihin
     if(virhe != 0){
         pvmvirhe.innerHTML = pvvirhe;
         ostovirhe.innerHTML = ovirhe;
         sijoitusvirhe.innerHTML = sijvirhe;
         osallistujavirhe.innerHTML = osvirhe;
         palkintovirhe.innerHTML = pvirhe;
-    }
+    }//jos ei virheitä, viedään syöttökenttien tiedot pythonille käsiteltäväksi
     else{
         var uusipelitietokentat = document.getElementById("uusipelitietokentat");
         uusipelitietokentat.remove();
@@ -297,6 +321,7 @@ function tallennaPeli(){
         //pythonilla käsiteltäväksi vietävät tiedot
         var server_data = [
             {
+                "nappi": "tallennapeli",
                 "pelityyppi": pelityyppi,
                 "nimi": nimi,
                 "pvm": pvm,
@@ -314,11 +339,7 @@ function tallennaPeli(){
             url: "/poskeridata",
             data: JSON.stringify(server_data),
             contentType: "application/json",
-            dataType: 'json',
-            success: function(data) {
-                console.log("Result:");
-                console.log(data);
-        }
+            dataType: 'json'
         });
     }
 }
