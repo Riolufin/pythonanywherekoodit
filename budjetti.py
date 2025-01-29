@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #author Jiri Lahtinen
-#version 28.1.2025
+#version 29.1.2025
 
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 import hashlib
@@ -764,7 +764,7 @@ def poskerijutut():
     if(session["kayttaja"] == "admin"):
         return redirect(url_for('admin'))
 
-    return redirect('pokeri')
+    return redirect(url_for('pokeri'))
 
 
 #käsitellään pokerisivu
@@ -789,11 +789,24 @@ def poskeridatajutut():
         pokeritietodict = pokeritiedot[0]
         #haetaan tietokannasta pyydetyt tiedot jos painettu nappi oli naytatiedotnappi
         if(pokeritietodict["nappi"] == "naytatiedot"):
+            #jos hakuehtona on kaikki, asetetaan hakutermi tietokantahakua varten
+            #niin että haettaessa valitaan kaikki
             for key in pokeritietodict:
                 if(pokeritietodict[key] == "Kaikki"):
                     pokeritietodict[key] = "%%"
+            #käsitellään palkintocheckboxin toiminta
+            if(pokeritietodict["palkinto"] == True):
+                pokeritietodict["palkinto"] = 0
+            else:
+                pokeritietodict["palkinto"] = -1
+            #käsitellään päivämäärävälin valinta
+            if(pokeritietodict["alkupvm"] == ""):
+                pokeritietodict["alkupvm"] = "0000-01-01"
+            if(pokeritietodict["loppupvm"] == ""):
+                pokeritietodict["loppupvm"] = "9999-01-01"
             kantatiedot = []
             tiedot = dict()
+            #haetaan tietokannasta tiedot annetuilla ehdoilla
             haetuttiedot = tietokanta.select(Pokeripelit.palkintorahat,
                             Pokeripelit.palkintovaluutta, Pokeripelit.pelityyppi,
                             Pokeripelit.nimi, Pokeripelit.paivamaara,
@@ -810,7 +823,10 @@ def poskeridatajutut():
                                     ).where(
                                     Pokeripelit.ostovaluutta.like(pokeritietodict["ostovaluutta"])
                                     ).where(
-                                    Pokeripelit.palkintovaluutta.like(pokeritietodict["palkintovaluutta"]))
+                                    Pokeripelit.palkintovaluutta.like(pokeritietodict["palkintovaluutta"])
+                                    ).where(Pokeripelit.palkintorahat > pokeritietodict["palkinto"]
+                                    ).where(Pokeripelit.paivamaara >= pokeritietodict["alkupvm"]
+                                    ).where(Pokeripelit.paivamaara <= pokeritietodict["loppupvm"])
             with tietokanta.engine.connect() as yhteys:
                 for rivi in yhteys.execute(haetuttiedot):
                     kantatiedot.append(rivi)
@@ -826,7 +842,6 @@ def poskeridatajutut():
                             "Palkintorahat": i[0],
                             "Palkintovaluutta": i[1]
                             }})
-            print(tiedot)
             return jsonify(tiedot)
 
         #lisätään peli tietokantaan jos painettu nappi oli uuden pelin tallennus
@@ -844,7 +859,7 @@ def poskeridatajutut():
             with tietokanta.engine.connect() as yhteys:
                 yhteys.execute(lisaapeli)
 
-    return redirect('pokeridata')
+    return redirect(url_for('pokeridata'))
 
 
 #käsitellään pokeridatasivu
@@ -863,12 +878,12 @@ def pokeridata():
     palkintotdollarit = 0
     palkintoeurot = 0
     palkintoliput = 0
-    uniikittyypit = dict()
-    uniikitnimet = dict()
-    uniikitostot = dict()
-    uniikitostovaluutat = dict()
-    uniikitpalkintovaluutat = dict()
-    tiedot = dict()
+    hakupalkkitiedot = pokeritietohakupalkki()
+    uniikittyypit = hakupalkkitiedot[0]
+    uniikitnimet = hakupalkkitiedot[1]
+    uniikitostot = hakupalkkitiedot[2]
+    uniikitostovaluutat = hakupalkkitiedot[3]
+    uniikitpalkintovaluutat = hakupalkkitiedot[4]
     rahatiedot = tietokanta.select(Pokeripelit.palkintorahat,
                     Pokeripelit.palkintovaluutta, Pokeripelit.pelityyppi,
                     Pokeripelit.nimi, Pokeripelit.paivamaara,
@@ -878,13 +893,8 @@ def pokeridata():
     with tietokanta.engine.connect() as yhteys:
         for rivi in yhteys.execute(rahatiedot):
             palkintotiedot.append(rivi)
+    tiedot = dict()
     for i in palkintotiedot:
-        uniikittyypit.update({i[2]: ""})
-        uniikitnimet.update({i[3]: ""})
-        uniikkiosto = format(round(float(i[5]), 2), '.2f')
-        uniikitostot.update({uniikkiosto: ""})
-        uniikitostovaluutat.update({i[6]: ""})
-        uniikitpalkintovaluutat.update({i[6]: ""})
         tiedot.update({i[9]:{
                             "Pelityyppi": i[2],
                             "Nimi": i[3],
@@ -896,11 +906,6 @@ def pokeridata():
                             "Palkintorahat": i[0],
                             "Palkintovaluutta": i[1]
                             }})
-    #poistetaan mahdolliset tyhjät
-    try:
-        del uniikitnimet[""]
-    except:
-        print("tuhottavaa ei löytynyt")
     for i, j in tiedot.items():
         j["Sisäänosto"] = round(j["Sisäänosto"], 2)
         j["Palkintorahat"] = round(j["Palkintorahat"], 2)
@@ -936,6 +941,38 @@ def fclaiva():
     if(session["kayttaja"] == "admin"):
         return redirect(url_for('admin'))
     return render_template('fclaiva.html')
+
+#haetaan tietokannasta tiedot pokeridatan hakupalkkia varten
+def pokeritietohakupalkki():
+    #haetaan käyttäjän tiedot tietokannasta
+    palkintotiedot = []
+    uniikittyypit = dict()
+    uniikitnimet = dict()
+    uniikitostot = dict()
+    uniikitostovaluutat = dict()
+    uniikitpalkintovaluutat = dict()
+    rahatiedot = tietokanta.select(Pokeripelit.palkintorahat,
+                    Pokeripelit.palkintovaluutta, Pokeripelit.pelityyppi,
+                    Pokeripelit.nimi, Pokeripelit.paivamaara,
+                    Pokeripelit.sisaanosto, Pokeripelit.ostovaluutta,
+                    Pokeripelit.sijoitus, Pokeripelit.osallistujat,
+                    Pokeripelit.id).where(Pokeripelit.tunnus == session["kayttaja"])
+    with tietokanta.engine.connect() as yhteys:
+        for rivi in yhteys.execute(rahatiedot):
+            palkintotiedot.append(rivi)
+    for i in palkintotiedot:
+        uniikittyypit.update({i[2]: ""})
+        uniikitnimet.update({i[3]: ""})
+        uniikkiosto = format(round(float(i[5]), 2), '.2f')
+        uniikitostot.update({uniikkiosto: ""})
+        uniikitostovaluutat.update({i[6]: ""})
+        uniikitpalkintovaluutat.update({i[6]: ""})
+    #poistetaan mahdolliset tyhjät
+    try:
+        del uniikitnimet[""]
+    except:
+        print("tuhottavaa ei löytynyt")
+    return [uniikittyypit, uniikitnimet, uniikitostot, uniikitostovaluutat, uniikitpalkintovaluutat]
 
 if __name__ == '__main__':
     app.debug = True

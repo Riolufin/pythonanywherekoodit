@@ -81,7 +81,7 @@ function pokeri() {
     maksuriver.innerHTML = ""
     //lasketaan pottikerroin ja asetetaan se sivulle jos ei ole virheitä
     //asetetaan virheet sivulle
-    if(virhe == 0){
+    if(virhe === 0){
         pottikerroin = maksukentta / pottikentta;
         //listataan vedot, joilla saadulla kertoimella maksetaan
         for(var[kasi, todnak] of Object.entries(postflop)){
@@ -131,7 +131,7 @@ function pokeripanos(){
     panosriver.innerHTML = ""
     //lasketaan panoksen suuruus eri vetoja vastaan
     //asetetaan virheet sivulle
-    if(virhe == 0){
+    if(virhe === 0){
         //listataan vedot ja panos niitä vastaan
         for(var[kasi, todnak] of Object.entries(postflop)){
             todnak = parseFloat(`${todnak}`);
@@ -169,32 +169,49 @@ function naytaTiedot(){
     var ostovaluutta = document.getElementById("naytaostovaluutta").value;
     var palkinto = document.getElementById("naytavoitot").checked;
     var palkintovaluutta = document.getElementById("naytavoitotvaluutta").value;
-
-    //pythonilla käsiteltäväksi vietävät tiedot
-    var server_data = [
-        {
-            "nappi": "naytatiedot",
-            "pelityyppi": pelityyppi,
-            "nimi": nimi,
-            "alkupvm": alkupvm,
-            "loppupvm": loppupvm,
-            "sisaanosto": sisaanosto,
-            "ostovaluutta": ostovaluutta,
-            "palkinto": palkinto,
-            "palkintovaluutta": palkintovaluutta
-        }
-        ];
-    //tehdään ajax-kutsu
-    $.ajax({
-        type: "POST",
-        url: "/poskeridata",
-        data: JSON.stringify(server_data),
-        contentType: "application/json",
-        dataType: 'json',
-        success: function(paskaa){
-            console.log(paskaa);
-        }
-    });
+    //tarkistetaan päivämäärävalinnan oikeellisuus
+    var pvmvirhekentta = document.getElementById("tietohakupvmvirhe");
+    var virhe = 0;
+    var pvmvirhe = "";
+    var alkudatepvm = Date.parse(alkupvm);
+    var loppudatepvm = Date.parse(loppupvm);
+    if(alkudatepvm > loppudatepvm){
+        virhe = 1;
+        pvmvirhe = "Alkupvm ei voi olla ennen loppupvm";
+    }
+    if(virhe === 0){//viedään tiedot pythonille käsiteltäväksi jos ei virheitä
+        pvmvirhekentta.innerHTML = pvmvirhe;
+        //pythonilla käsiteltäväksi vietävät tiedot
+        var server_data = [
+            {
+                "nappi": "naytatiedot",
+                "pelityyppi": pelityyppi,
+                "nimi": nimi,
+                "alkupvm": alkupvm,
+                "loppupvm": loppupvm,
+                "sisaanosto": sisaanosto,
+                "ostovaluutta": ostovaluutta,
+                "palkinto": palkinto,
+                "palkintovaluutta": palkintovaluutta
+            }
+            ];
+        //tehdään ajax-kutsu
+        $.ajax({
+            type: "POST",
+            url: "/poskeridata",
+            data: JSON.stringify(server_data),
+            contentType: "application/json",
+            dataType: 'json'
+        }).done(function (response){
+            console.log(response);
+            naytaPokeritiedot(response);
+        }).fail(function (response){
+            console.log("Virhe tietojen haussa");
+        });
+    }//astetaan virheet näkyviin jos on virheitä
+    else{
+        pvmvirhekentta.innerHTML = pvmvirhe;
+    }
 }
 
 //käsitellään uuden pelin lisäys
@@ -465,4 +482,63 @@ function poistaTyhjatJaMuutaPilkut(muok){
     muok = muok.replace(",",".");
     muok = muok.trim();
     return muok;
+}
+
+//asetetaan haetut tiedot pokeridatasta näkyviin
+function naytaPokeritiedot(haetuttiedot){
+    var palkintorahat = 0
+    var palkintodollarit = 0
+    var palkintocdollarit = 0
+    var palkintotdollarit = 0
+    var palkintoeurot = 0
+    var palkintoliput = 0
+    for(var i in haetuttiedot){
+        palkintorahat += parseFloat(haetuttiedot[i].Palkintorahat);
+        if(haetuttiedot[i].Palkintovaluutta === "$"){
+            palkintodollarit += parseFloat(haetuttiedot[i].Palkintorahat);
+        }
+        if(haetuttiedot[i].Palkintovaluutta === "C$"){
+            palkintocdollarit += parseFloat(haetuttiedot[i].Palkintorahat);
+        }
+        if(haetuttiedot[i].Palkintovaluutta === "T$"){
+            palkintotdollarit += parseFloat(haetuttiedot[i].Palkintorahat);
+        }
+        if(haetuttiedot[i].Palkintovaluutta === "€"){
+            palkintoeurot += parseFloat(haetuttiedot[i].Palkintorahat);
+        }
+        if(haetuttiedot[i].Palkintovaluutta === "Lippu"){
+            palkintoliput += parseFloat(haetuttiedot[i].Palkintorahat);
+        }
+    }
+    var palkintokentta = document.getElementById("palkintokentta");
+    var kaikkipalkinnot = document.getElementById("kaikkipalkinnot");
+    palkintokentta.innerHTML = "";
+    if(palkintodollarit > 0){
+        palkintodollarit = Math.round((palkintodollarit + Number.EPSILON)*100)/100;
+        palkintokentta.innerHTML += `Palkinto $ yhteensä: <b>$${palkintodollarit}</b><br>`;
+    }
+    if(palkintocdollarit > 0){
+        palkintocdollarit = Math.round((palkintocdollarit + Number.EPSILON)*100)/100;
+        palkintokentta.innerHTML += `Palkinto C$ yhteensä: <b>C$${palkintocdollarit}</b><br>`;
+    }
+    if(palkintotdollarit > 0){
+        palkintotdollarit = Math.round((palkintotdollarit + Number.EPSILON)*100)/100;
+        palkintokentta.innerHTML += `Palkinto T$ yhteensä: <b>T$${palkintotdollarit}</b><br>`;
+    }
+    if(palkintoeurot > 0){
+        palkintoeurot = Math.round((palkintoeurot + Number.EPSILON)*100)/100;
+        palkintokentta.innerHTML += `Palkinto € yhteensä: <b>${palkintoeurot}€</b><br>`;
+    }
+    if(palkintoliput > 0){
+        palkintoliput = Math.round((palkintoliput + Number.EPSILON)*100)/100;
+        palkintokentta.innerHTML += `Palkintoliput yhteensä: <b>${palkintoliput}</b><br>`;
+    }
+    palkintorahat = Math.round((palkintorahat + Number.EPSILON)*100)/100;
+    kaikkipalkinnot.innerHTML = `<br>Kaikki palkinnot yhteensä: <b>${palkintorahat}</b>`;
+    console.log(Math.round((palkintorahat + Number.EPSILON) * 100) / 100);
+    console.log(Math.round((palkintodollarit + Number.EPSILON) * 100) / 100);
+    console.log(Math.round((palkintocdollarit + Number.EPSILON) * 100) / 100);
+    console.log(Math.round((palkintotdollarit + Number.EPSILON) * 100) / 100);
+    console.log(Math.round((palkintoeurot + Number.EPSILON) * 100) / 100);
+    console.log(Math.round((palkintoliput + Number.EPSILON) * 100) / 100);
 }

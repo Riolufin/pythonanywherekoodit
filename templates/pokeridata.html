@@ -49,17 +49,27 @@
                 {% endfor %}
             </select><b>valuutassa</b></label>
             <button id="naytatiedotnappi" value="nayta" onclick="naytaTiedot();">Näytä</button>
+            <p class="virhe" id="tietohakupvmvirhe"></p>
         </div>
         </div>
         <h2>Näytetään näytettävät tiedot</h2>
-        <p>
+        <div id="palkintokentta">
             {% for key, value in palkinnot.items() %}
                 {% if value > 0 %}
-                    Palkinto {{ key }} yhteensä: <b>{{ value }}</b><br>
+                    {% if key == "€" %}
+                    Palkinto {{ key }} yhteensä:
+                    <b>{{ value }}{{ key }}</b><br>
+                    {% elif key == "Lippu" %}
+                    Palkintoliput yhteensä:
+                    <b>{{ value }}</b><br>
+                    {% else %}
+                    Palkinto {{ key }} yhteensä:
+                    <b>{{ key }}{{ value }}</b><br>
+                    {% endif %}
                 {% endif %}
             {% endfor %}
-        </p>
-        <p>Kaikki palkinnot yhteensä: <b>{{ rahat["palkintorahat"] }}</b></p>
+        </div>
+        <div id="kaikkipalkinnot"><br>Kaikki palkinnot yhteensä: <b>{{ rahat["palkintorahat"] }}</b></div>
         <p>Näytä kaikki pelit tietoineen: <input type="submit" value="Näytä" id="naytanappi" onclick="naytaKaikki();"/></p>
         <ul hidden="hidden" id="kaikkitiedot">
             {% for key, value in tiedot.items() %}
