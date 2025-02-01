@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #author Jiri Lahtinen
-#version 29.1.2025
+#version 1.2.2025
 
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 import hashlib
@@ -898,7 +898,7 @@ def pokeridata():
         tiedot.update({i[9]:{
                             "Pelityyppi": i[2],
                             "Nimi": i[3],
-                            "Päivämäärä": i[4],
+                            "Päivämäärä": muokkaaPaivamaara(i[4]),
                             "Sisäänosto": i[5],
                             "Ostovaluutta": i[6],
                             "Sijoitus": i[7],
@@ -973,6 +973,23 @@ def pokeritietohakupalkki():
     except:
         print("tuhottavaa ei löytynyt")
     return [uniikittyypit, uniikitnimet, uniikitostot, uniikitostovaluutat, uniikitpalkintovaluutat]
+
+#muokataan päivämäärä muotoon d/m/y, missä alkunollat on poistettu
+def muokkaaPaivamaara(pvm):
+    muokpvm = pvm.strftime('%d/%m/%Y')
+    paiva = muokpvm[0:2]
+    kuu = muokpvm[3:5]
+    vuosi = muokpvm[6:]
+    if(paiva[0] == "0"):
+        paiva = paiva[1:]
+    if(kuu[0] == "0"):
+        kuu = kuu[1:]
+    i = 0
+    while(vuosi[i] == "0"):
+        vuosi = vuosi[i+1:]
+        i += 1
+    uusipvm = paiva + "." + kuu + "." + vuosi
+    return uusipvm
 
 if __name__ == '__main__':
     app.debug = True

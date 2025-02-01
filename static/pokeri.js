@@ -486,12 +486,16 @@ function poistaTyhjatJaMuutaPilkut(muok){
 
 //asetetaan haetut tiedot pokeridatasta näkyviin
 function naytaPokeritiedot(haetuttiedot){
+    //haetaan elementti, jossa tiedot näytetään ja alustetaan tarvittavat muuttujat
+    var tietolista = document.getElementById("kaikkitiedot");
+    tietolista.innerHTML = "";
     var palkintorahat = 0
     var palkintodollarit = 0
     var palkintocdollarit = 0
     var palkintotdollarit = 0
     var palkintoeurot = 0
     var palkintoliput = 0
+    //lasketaan palkinnot eri valuutoissa
     for(var i in haetuttiedot){
         palkintorahat += parseFloat(haetuttiedot[i].Palkintorahat);
         if(haetuttiedot[i].Palkintovaluutta === "$"){
@@ -509,36 +513,49 @@ function naytaPokeritiedot(haetuttiedot){
         if(haetuttiedot[i].Palkintovaluutta === "Lippu"){
             palkintoliput += parseFloat(haetuttiedot[i].Palkintorahat);
         }
+        //lisätään elementit näytettäville tiedoille ja muokataan luvut
+        //näyttämään aina kaksi desimaalia sekä päivämäärä mielekkääseen muotoon
+        tietolista.innerHTML += `<li>Peli<ul id="tietoalkiot${i}"></ul></li>`;
+        var alatietolista = document.getElementById("tietoalkiot" + i);
+        sisaanosto = parseFloat(haetuttiedot[i].Sisäänosto);
+        sisaanosto = (Math.round((sisaanosto + Number.EPSILON)*100)/100).toFixed(2);
+        palkinto = parseFloat(haetuttiedot[i].Palkintorahat);
+        palkinto = (Math.round((palkinto + Number.EPSILON)*100)/100).toFixed(2);
+        pvm = new Date(haetuttiedot[i].Päivämäärä).toLocaleDateString();
+        alatietolista.innerHTML += `<li>Pelityyppi: ${haetuttiedot[i].Pelityyppi}</li>
+                            <li>Nimi: ${haetuttiedot[i].Nimi}</li>
+                            <li>Päivämäärä: ${pvm}</li>
+                            <li>Sisäänosto: ${sisaanosto}</li>
+                            <li>Ostovaluutta: ${haetuttiedot[i].Ostovaluutta}</li>
+                            <li>Sijoitus: ${haetuttiedot[i].Sijoitus}</li>
+                            <li>Osallistujat: ${haetuttiedot[i].Osallistujat}</li>
+                            <li>Palkintorahat: ${palkinto}</li>
+                            <li>Palkintovaluutta: ${haetuttiedot[i].Palkintovaluutta}</li></ul></li>`;
+
     }
     var palkintokentta = document.getElementById("palkintokentta");
     var kaikkipalkinnot = document.getElementById("kaikkipalkinnot");
     palkintokentta.innerHTML = "";
     if(palkintodollarit > 0){
-        palkintodollarit = Math.round((palkintodollarit + Number.EPSILON)*100)/100;
+        palkintodollarit = (Math.round((palkintodollarit + Number.EPSILON)*100)/100).toFixed(2);
         palkintokentta.innerHTML += `Palkinto $ yhteensä: <b>$${palkintodollarit}</b><br>`;
     }
     if(palkintocdollarit > 0){
-        palkintocdollarit = Math.round((palkintocdollarit + Number.EPSILON)*100)/100;
+        palkintocdollarit = (Math.round((palkintocdollarit + Number.EPSILON)*100)/100).toFixed(2);
         palkintokentta.innerHTML += `Palkinto C$ yhteensä: <b>C$${palkintocdollarit}</b><br>`;
     }
     if(palkintotdollarit > 0){
-        palkintotdollarit = Math.round((palkintotdollarit + Number.EPSILON)*100)/100;
+        palkintotdollarit = (Math.round((palkintotdollarit + Number.EPSILON)*100)/100).toFixed(2);
         palkintokentta.innerHTML += `Palkinto T$ yhteensä: <b>T$${palkintotdollarit}</b><br>`;
     }
     if(palkintoeurot > 0){
-        palkintoeurot = Math.round((palkintoeurot + Number.EPSILON)*100)/100;
+        palkintoeurot = (Math.round((palkintoeurot + Number.EPSILON)*100)/100).toFixed(2);
         palkintokentta.innerHTML += `Palkinto € yhteensä: <b>${palkintoeurot}€</b><br>`;
     }
     if(palkintoliput > 0){
-        palkintoliput = Math.round((palkintoliput + Number.EPSILON)*100)/100;
+        palkintoliput = (Math.round((palkintoliput + Number.EPSILON)*100)/100).toFixed(2);
         palkintokentta.innerHTML += `Palkintoliput yhteensä: <b>${palkintoliput}</b><br>`;
     }
-    palkintorahat = Math.round((palkintorahat + Number.EPSILON)*100)/100;
+    palkintorahat = (Math.round((palkintorahat + Number.EPSILON)*100)/100).toFixed(2);
     kaikkipalkinnot.innerHTML = `<br>Kaikki palkinnot yhteensä: <b>${palkintorahat}</b>`;
-    console.log(Math.round((palkintorahat + Number.EPSILON) * 100) / 100);
-    console.log(Math.round((palkintodollarit + Number.EPSILON) * 100) / 100);
-    console.log(Math.round((palkintocdollarit + Number.EPSILON) * 100) / 100);
-    console.log(Math.round((palkintotdollarit + Number.EPSILON) * 100) / 100);
-    console.log(Math.round((palkintoeurot + Number.EPSILON) * 100) / 100);
-    console.log(Math.round((palkintoliput + Number.EPSILON) * 100) / 100);
 }
