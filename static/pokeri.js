@@ -50,6 +50,18 @@ let river = {
         "suoran päihinveto, väri tai pari": 0.4565/(1-0.4565)
     };
 
+//tehdään responsiivinen navbar
+function navbar(){
+    var navi = document.getElementById("topnavi");
+    if (navi.className === "topnav") {
+        navi.className += "responsive";
+    }
+    else {
+        navi.className = "topnav";
+    }
+}
+
+
 //käsitellään pottikerroinlaskurin toiminta
 function pokeri() {
     //Haetaan potti- ja maksukentän sisältö

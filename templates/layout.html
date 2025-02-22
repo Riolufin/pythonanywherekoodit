@@ -5,15 +5,29 @@
         {% block css %}
         <link href="../static/tyylit.css" rel="StyleSheet" type="text/css" />
         {% endblock %}
-        {% block scripts %}{% endblock %}
+        {% block scripts %}
+        <script src="../static/pokeri.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        {% endblock %}
         <title>{% block title %}Paska{% endblock %}</title>
     </head>
-    <div class="topnav">
-        <a id="naveka" href="{{ url_for('budjetti') }}">Budjetti</a>
-        <a href="{{ url_for('pokeri') }}">Pokerilaskurit</a>
-        <a href="{{ url_for('pokeridata') }}">Pokeridata</a>
-        <a href="{{ url_for('fclaiva') }}">FC-laivojen gilin jako</a>
-        <a id="navvika" href="{{ url_for('logout') }}">Kirjaudu ulos</a>
+    <div class="topnav" id="topnavi">
+        <a class="isoruutu" href="{{ url_for('budjetti') }}">Budjetti</a>
+        <a class="isoruutu" href="{{ url_for('pokeri') }}">Pokerilaskurit</a>
+        <a class="isoruutu" href="{{ url_for('pokeridata') }}">Pokeridata</a>
+        <a class="isoruutu" href="{{ url_for('fclaiva') }}">FC-laivojen gilin jako</a>
+        <a class="isoruutu" class="navvika" id="navvika" href="{{ url_for('logout') }}">Kirjaudu ulos</a>
+        <div class="dropdown">
+            <button class="topnavdrop" onclick="navbar()">Näytä
+            </button>
+            <div class="topnavdroptavara">
+                <a href="{{ url_for('budjetti') }}">Budjetti</a>
+                <a href="{{ url_for('pokeri') }}">Pokerilaskurit</a>
+                <a href="{{ url_for('pokeridata') }}">Pokeridata</a>
+                <a href="{{ url_for('fclaiva') }}">FC-laivojen gilin jako</a>
+                <a class="navvika" href="{{ url_for('logout') }}">Kirjaudu ulos</a>
+            </div>
+        </div>
     </div>
     <body>
         <div id="content">{% block content %}{% endblock %}</div>

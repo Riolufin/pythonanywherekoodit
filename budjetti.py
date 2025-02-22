@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #author Jiri Lahtinen
-#version 1.2.2025
+#version 22.2.2025
 
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 import hashlib
@@ -109,8 +109,8 @@ def kirjaudu():
         salasana = ""
 
     tunnustrimmattu = tunnus.strip()
-    oikeaTunnus = ""
     oikeaSalasana = ""
+    oikeaTunnus= ""
     #haetaan tietokannasta syötetty tunnus ja sen salasana
     tiedot = tietokanta.select(Tunnukset).where(Tunnukset.tunnus == tunnustrimmattu)
     try:
@@ -123,13 +123,10 @@ def kirjaudu():
     except:
         virhe = 1
 
-    #enkoodataan tietokannan tunnus ja salasana
-    oikea = hashlib.sha512()
-    oikea.update(oikeaTunnus.encode("UTF-8"))
-    oikea.update(oikeaSalasana.encode("UTF-8"))
+    oikea = oikeaSalasana
     #enkoodataan lomakkeelta haettu tunnus ja salasana
     m = hashlib.sha512()
-    m.update(tunnustrimmattu.encode("UTF-8"))
+    m.update(str(oikeaTunnus).encode("UTF-8"))
     m.update(salasana.encode("UTF-8"))
     #alustetaan lomakkeen kentät
     kentat = {"tunnus":"","salasana":""}
@@ -138,7 +135,7 @@ def kirjaudu():
     #varmistetaan, että lomake on lähetetty ja tehdään tarkistukset sekä asetetaan sessiomuuttujat onnistuessa
     if request.method == 'POST':
         #jos tunnus on admin, siirrytään admin-sivulle
-        if m.hexdigest() == oikea.hexdigest() and tunnustrimmattu == "admin":
+        if m.hexdigest() == oikea and tunnustrimmattu == "admin":
             session['kirjautunut'] = "ok"
             session['kayttaja'] = tunnustrimmattu
             session['admin'] = "ok"
@@ -165,7 +162,7 @@ def kirjaudu():
                 virhe = 1
 
         #siirrytään etusivulle jos tarkistukset menivät läpi
-        if m.hexdigest() == oikea.hexdigest() and virhe == 0:
+        if m.hexdigest() == oikea and virhe == 0:
             session['kirjautunut'] = "ok"
             session['kayttaja'] = tunnustrimmattu
             return redirect(url_for('budjetti'))
@@ -255,7 +252,11 @@ def luotunnus():
 
                 #jos kaikki on kunnossa, luodaan tunnus tietokantaan ja ilmoitetaan onnistumisesta
                 if virhe == 0:
-                    lisaa = tietokanta.insert(Tunnukset).values(tunnus = uusitunnus, salasana = uusisalasana, email = email)
+                    #enkoodataan salasana tietokantaan
+                    m = hashlib.sha512()
+                    m.update(str(uusitunnus).encode("UTF-8"))
+                    m.update(uusisalasana.encode("UTF-8"))
+                    lisaa = tietokanta.insert(Tunnukset).values(tunnus = uusitunnus, salasana = m.hexdigest(), email = email)
                     with tietokanta.engine.connect() as yhteys:
                         yhteys.execute(lisaa)
 

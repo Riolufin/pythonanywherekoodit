@@ -24,9 +24,78 @@ form{
     font-size: 2vh;
 }
 
-.topnav a{
+.topnav a {
+  float: left;
+  display: block;
+  color: black;
+  text-align: center;
+  text-decoration: none;
+  font-size: 3vh;
+}
+
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+
+.dropdown .topnavdrop {
+  font-size: 3vh;
+  border: none;
+  outline: none;
+  color: black;
+  padding: 0.2em 0.2em;
+  background-color: green;
+  font-family: inherit;
+  margin: 0;
+}
+
+.topnavdroptavara {
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.topnavdroptavara a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.topnav a:not(.dropdown .topnavdrop){
+    display: none;
     padding-left: 1em;
     color: black;
+}
+
+.topnavresponsive {
+    position: relative;
+}
+
+
+.topnavresponsive .isoruutu {
+    float: none;
+    display: none;
+    text-align: left;
+}
+
+.topnavresponsive .dropdown {
+    float: none;
+}
+
+.topnavresponsive .topnavdroptavara {
+    display: block;
+    position: relative;
+}
+
+.topnavresponsive .dropdown .topnavdrop {
+    display: block;
+    width: 100%;
+    text-align: left;
 }
 
 .kirjaudusubmit{
@@ -94,13 +163,6 @@ form{
 #naveka{
     color: black;
     padding-left: 0;
-}
-
-#navvika{
-    border: none;
-    color: black;
-    float: right;
-    text-align: center;
 }
 
 .adminlista{
@@ -225,9 +287,32 @@ a{
         width: 99%;
     }
 
-    #navvika{
+    .topnav a{
+        font-size: 2vh;
+    }
+
+    .navvika{
+        border: none;
+        color: black;
+        text-align: center;
         font-size: 100%;
         padding-right: 1em;
+    }
+
+    #navvika{
+        float: right;
+    }
+
+    #topnavi .isoruutu{
+        display: block;
+    }
+
+    .topnavdrop{
+        display: none;
+    }
+
+    .navbardroptavara{
+        display: none;
     }
 
     .adminsubmit{
