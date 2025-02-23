@@ -269,7 +269,7 @@ function lisaaPeli(){
             <option value="T$">T$</option>
             <option value="Lippu">Lippu</option></select>
             <p class="virhe" id="palkintovirhe"><br></p>
-            <br><input type="submit" value="Tallenna"
+            <br><br><input type="submit" value="Tallenna"
             onclick="tallennaPeli();"/><br><br><br>
             <input type="submit" value="Peruuta"
             onclick="peliLisatty();"/></div>`;
@@ -500,30 +500,55 @@ function poistaTyhjatJaMuutaPilkut(muok){
 function naytaPokeritiedot(haetuttiedot){
     //haetaan elementti, jossa tiedot näytetään ja alustetaan tarvittavat muuttujat
     var tietolista = document.getElementById("kaikkitiedot");
+    var pelimaarakentta = document.getElementById("pelimaara");
+    pelimaara = 0;
     tietolista.innerHTML = "";
-    var palkintorahat = 0
-    var palkintodollarit = 0
-    var palkintocdollarit = 0
-    var palkintotdollarit = 0
-    var palkintoeurot = 0
-    var palkintoliput = 0
+    var palkintorahat = 0;
+    var ostorahat = 0;
+    var palkintodollarit = 0;
+    var ostodollarit = 0;
+    var palkintocdollarit = 0;
+    var ostocdollarit = 0;
+    var palkintotdollarit = 0;
+    var ostotdollarit = 0;
+    var palkintoeurot = 0;
+    var ostoeurot = 0;
+    var palkintoliput = 0;
+    var ostoliput = 0;
     //lasketaan palkinnot eri valuutoissa
     for(var i in haetuttiedot){
+        pelimaara += 1;
         palkintorahat += parseFloat(haetuttiedot[i].Palkintorahat);
+        ostorahat += parseFloat(haetuttiedot[i].Sisäänosto);
         if(haetuttiedot[i].Palkintovaluutta === "$"){
             palkintodollarit += parseFloat(haetuttiedot[i].Palkintorahat);
+        }
+        if(haetuttiedot[i].Ostovaluutta === "$"){
+            ostodollarit += parseFloat(haetuttiedot[i].Sisäänosto);
         }
         if(haetuttiedot[i].Palkintovaluutta === "C$"){
             palkintocdollarit += parseFloat(haetuttiedot[i].Palkintorahat);
         }
+        if(haetuttiedot[i].Ostovaluutta === "C$"){
+            ostocdollarit += parseFloat(haetuttiedot[i].Sisäänosto);
+        }
         if(haetuttiedot[i].Palkintovaluutta === "T$"){
             palkintotdollarit += parseFloat(haetuttiedot[i].Palkintorahat);
+        }
+        if(haetuttiedot[i].Ostovaluutta === "T$"){
+            ostotdollarit += parseFloat(haetuttiedot[i].Sisäänosto);
         }
         if(haetuttiedot[i].Palkintovaluutta === "€"){
             palkintoeurot += parseFloat(haetuttiedot[i].Palkintorahat);
         }
+        if(haetuttiedot[i].Ostovaluutta === "€"){
+            ostoeurot += parseFloat(haetuttiedot[i].Sisäänosto);
+        }
         if(haetuttiedot[i].Palkintovaluutta === "Lippu"){
             palkintoliput += parseFloat(haetuttiedot[i].Palkintorahat);
+        }
+        if(haetuttiedot[i].Ostovaluutta === "Lippu"){
+            ostoliput += parseFloat(haetuttiedot[i].Sisäänosto);
         }
         //lisätään elementit näytettäville tiedoille ja muokataan luvut
         //näyttämään aina kaksi desimaalia sekä päivämäärä mielekkääseen muotoon
@@ -547,7 +572,12 @@ function naytaPokeritiedot(haetuttiedot){
     }
     var palkintokentta = document.getElementById("palkintokentta");
     var kaikkipalkinnot = document.getElementById("kaikkipalkinnot");
+    var sisaanostokentta = document.getElementById("sisaanostokentta");
+    var kaikkisisaanostot = document.getElementById("kaikkisisaanostot");
+    var voittotappiokentta = document.getElementById("voittotappio");
+    voittotappiokentta.innerHTML = "<h2>Voitto/tappio dollareissa:</h2>";
     palkintokentta.innerHTML = "";
+    sisaanostokentta.innerHTML = "";
     if(palkintodollarit > 0){
         palkintodollarit = (Math.round((palkintodollarit + Number.EPSILON)*100)/100).toFixed(2);
         palkintokentta.innerHTML += `Palkinto $ yhteensä: <b>$${palkintodollarit}</b><br>`;
@@ -568,6 +598,44 @@ function naytaPokeritiedot(haetuttiedot){
         palkintoliput = (Math.round((palkintoliput + Number.EPSILON)*100)/100).toFixed(2);
         palkintokentta.innerHTML += `Palkintoliput yhteensä: <b>${palkintoliput}</b><br>`;
     }
+    if(ostodollarit > 0){
+        ostodollarit = (Math.round((ostodollarit + Number.EPSILON)*100)/100).toFixed(2);
+        sisaanostokentta.innerHTML += `Sisäänosto $ yhteensä: <b>$${ostodollarit}</b><br>`;
+    }
+    if(ostocdollarit > 0){
+        ostocdollarit = (Math.round((ostocdollarit + Number.EPSILON)*100)/100).toFixed(2);
+        sisaanostokentta.innerHTML += `Sisäänosto C$ yhteensä: <b>C$${ostocdollarit}</b><br>`;
+    }
+    if(ostotdollarit > 0){
+        ostotdollarit = (Math.round((ostotdollarit + Number.EPSILON)*100)/100).toFixed(2);
+        sisaanostokentta.innerHTML += `Sisäänosto T$ yhteensä: <b>T$${ostotdollarit}</b><br>`;
+    }
+    if(ostoeurot > 0){
+        ostoeurot = (Math.round((ostoeurot + Number.EPSILON)*100)/100).toFixed(2);
+        sisaanostokentta.innerHTML += `Sisäänosto € yhteensä: <b>${ostoeurot}€</b><br>`;
+    }
+    if(ostoliput > 0){
+        ostoliput = (Math.round((ostoliput + Number.EPSILON)*100)/100).toFixed(2);
+        sisaanostokentta.innerHTML += `Sisäänostoliput yhteensä: <b>${ostoliput}</b><br>`;
+    }
     palkintorahat = (Math.round((palkintorahat + Number.EPSILON)*100)/100).toFixed(2);
+    ostorahat = (Math.round((ostorahat + Number.EPSILON)*100)/100).toFixed(2);
+    voittotappiodol = (Math.round(((ostodollarit - palkintodollarit) + Number.EPSILON)*100)/100).toFixed(2);
+    voittotappio = (Math.round(((ostorahat - palkintorahat) + Number.EPSILON)*100)/100).toFixed(2);
     kaikkipalkinnot.innerHTML = `<br>Kaikki palkinnot yhteensä: <b>${palkintorahat}</b>`;
+    kaikkisisaanostot.innerHTML = `<br>Kaikki sisäänostot yhteensä: <b>${ostorahat}</b>`;
+    if(voittotappiodol <= 0){
+        voittotappiokentta.innerHTML += `Voittoa yhteensä $${-voittotappiodol}`
+    }
+    if(voittotappiodol > 0){
+        voittotappiokentta.innerHTML += `Tappiota yhteensä $${voittotappiodol}`
+    }
+    voittotappiokentta.innerHTML += `<br><h2>Voitto/tappio kaikilla valuutoilla:</h2>`
+    if(voittotappio <= 0){
+        voittotappiokentta.innerHTML += `Voittoa yhteensä ${-voittotappio}`
+    }
+    if(voittotappio > 0){
+        voittotappiokentta.innerHTML += `Tappiota yhteensä ${voittotappio}`
+    }
+    pelimaarakentta.innerHTML = `<p>Pelejä yhteensä ${pelimaara}</p>`;
 }

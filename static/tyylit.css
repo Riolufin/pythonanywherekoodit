@@ -175,6 +175,11 @@ input.adminbox{
     width: 2.5vh;
 }
 
+input.pokeribox{
+    height: 3vh;
+    width: 3vh;
+}
+
 a{
     text-decoration: none;
 }
@@ -250,23 +255,54 @@ a{
 }
 
 #valittudataotsikko{
-    height: 1.5em;
+    height: 100%;
+    max-height: 3em;
     padding-top: 0.5em;
 }
 
 #tietovalintatausta{
-    height: 1.6em;
-    padding-top: 0.4em;
+    height: 100%;
     background: cyan;
 }
 
 .tietovalinta{
     display: flex;
+    flex-direction: column;
     justify-content: flex-start;
-    height: 1.2em;
+    height: 100%;
     width: 100%;
-    align-items: center;
+    align-items: flex-start;
     column-gap: 1em;
+    row-gap: 0.5em;
+}
+
+.tietovalinta input, .tietovalinta select, .uusipeli select, .uusipeli input{
+    max-width: 50em;
+    font-size: 3vh;
+    border: 1px solid black;
+    min-height: 5vh;
+}
+
+.tietovalinta button{
+    max-width: 50em;
+    font-size: 3vh;
+    min-height: 5vh;
+}
+
+#naytanappi{
+    max-width: 50em;
+    font-size: 3vh;
+    min-height: 5vh;
+}
+
+#haravoidutrahat{
+    background-color: red;
+    max-width: 25em;
+}
+
+#voittotappio{
+    background-color: cyan;
+    max-width: 25em;
 }
 
 @media only screen and (min-width: 65em){
@@ -326,6 +362,11 @@ a{
     }
 
     input.adminbox{
+        height: auto;
+        width: auto;
+    }
+
+    input.pokeribox{
         height: auto;
         width: auto;
     }
@@ -394,5 +435,31 @@ a{
         font-size: 100%;
         float: right;
         width: 20em;
+    }
+
+    #tietovalintatausta{
+        height: 1.6em;
+        padding-top: 0.4em;
+        background: cyan;
+    }
+
+    .tietovalinta{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        height: 1.2em;
+        width: 100%;
+        align-items: center;
+        column-gap: 1em;
+    }
+
+    .tietovalinta input, .tietovalinta select, .tietovalinta button, .uusipeli input, .uusipeli select, #naytanappi{
+        min-height: 100%;
+        font-size: 100%;
+    }
+
+    #valittudataotsikko{
+        max-height: 1.5em;
+        padding-top: 0.5em;
     }
 }

@@ -37,7 +37,7 @@
                 {% endfor %}
             </select><b>valuutassa</b></label>
             <label for="naytavoitot"><b>Näytä vain voittoisat pelit: </b>
-            <input type="checkbox" id="naytavoitot"/>
+            <input type="checkbox" id="naytavoitot" class="pokeribox"/>
             <select id="naytavoitotvaluutta">
                 <option value="Kaikki">Kaikki</option>
                 {% for pvaluutta in palkintovaluutat %}
@@ -48,14 +48,14 @@
             <p class="virhe" id="tietohakupvmvirhe"></p>
         </div>
         </div>
-        <h2>Näytetään näytettävät tiedot</h2>
+        <h2>Pelien tiedot</h2>
         <div id="palkintokentta">
             {% for key, value in palkinnot.items() %}
                 {% if value > 0 %}
                     {% if key == "€" %}
                     Palkinto {{ key }} yhteensä:
                     <b>{{ value }}{{ key }}</b><br>
-                    {% elif key == "Lippu" %}
+                    {% elif key == "liput" %}
                     Palkintoliput yhteensä:
                     <b>{{ value }}</b><br>
                     {% else %}
@@ -66,7 +66,41 @@
             {% endfor %}
         </div>
         <div id="kaikkipalkinnot"><br>Kaikki palkinnot yhteensä: <b>{{ rahat["palkintorahat"] }}</b></div>
-        <p>Näytä kaikki pelit tietoineen: <input type="submit" value="Näytä" id="naytanappi" onclick="naytaKaikki();"/></p>
+        <br>
+        <div id="sisaanostokentta">
+            {% for key, value in kulut.items() %}
+                {% if value > 0 %}
+                    {% if key == "€" %}
+                    Sisäänosto {{ key }} yhteensä:
+                    <b>{{ value }}{{ key }}</b><br>
+                    {% elif key == "liput" %}
+                    Sisäänostoliput yhteensä:
+                    <b>{{ value }}</b><br>
+                    {% else %}
+                    Sisäänosto {{ key }} yhteensä:
+                    <b>{{ key }}{{ value }}</b><br>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div id="kaikkisisaanostot"><br>Kaikki sisäänostot yhteensä: <b>{{ rahat["ostot"] }}</b></div>
+        <div id="voittotappio">
+            <h2>Voitto/tappio dollareissa:</h2>
+            {% if palkinnot["$"] >= kulut["$"] %}
+                Voittoa yhteensä ${{ palkinnot["$"] - kulut["$"] }}
+            {% else %}
+                Tappiota yhteensä ${{ kulut["$"] - palkinnot["$"] }}
+            {% endif %}
+            <br>
+            <h2>Voitto/tappio kaikilla valuutoilla:</h2>
+            {% if rahat["ostot"] <= rahat["palkintorahat"] %}
+                Voittoa yhteensä {{ rahat["palkintorahat"] - rahat["ostot"] }}
+            {% else %}
+                Tappiota yhteensä {{ rahat["ostot"] - rahat["palkintorahat"] }}
+            {% endif %}
+        </div>
+        <p id="pelimaara">Pelejä yhteensä {{ pelimaara }}</p>
+        <p>Näytä pelit tietoineen: <input type="submit" value="Näytä" id="naytanappi" onclick="naytaKaikki();"/></p>
         <ul hidden="hidden" id="kaikkitiedot">
             {% for key, value in tiedot.items() %}
             <li>Peli<ul>
@@ -76,6 +110,13 @@
             </ul></li>
             {% endfor %}
         </ul>
+        <div id="haravoidutrahat">Kaikista peleistä haravoidut rahat:
+        <ul>
+            <li>Haravoidut dollarit ${{ haravakentat["haravasumma"] }}</li>
+            <li>Haravoidut lippudollarit ${{ haravakentat["haravaliput"] }}</li>
+            <li>Haravoitu yhteensä ${{ haravakentat["haravakoko"] }}</li>
+        </ul>
+        </div>
     </div>
     <div class="uusipeli" id="uusipelicontainer">
         <input type="submit" name="uusipelinappi" id="lisaauusipeli"

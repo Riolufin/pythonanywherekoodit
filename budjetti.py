@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #author Jiri Lahtinen
-#version 22.2.2025
+#version 23.2.2025
 
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 import hashlib
@@ -62,6 +62,13 @@ class Pokeripelit(tietokanta.Model):
     palkintovaluutta = tietokanta.Column(tietokanta.String(255))
     tunnus = tietokanta.Column(tietokanta.String(4096))
     id = tietokanta.Column(tietokanta.Integer, primary_key=True)
+
+#peliharavat tietokanta
+class Peliharavat(tietokanta.Model):
+    __tablename__ = "peliharavat"
+
+    pelityyppi = tietokanta.Column(tietokanta.String(255), primary_key=True)
+    harava = tietokanta.Column(tietokanta.Integer)
 
 def auth(f):
     ''' Tämä decorator hoitaa kirjautumisen tarkistamisen ja ohjaa
@@ -870,15 +877,27 @@ def pokeridata():
     #tarkistetaan onko käyttäjä admin ja jos on, siirrytään admin-sivulle
     if(session["kayttaja"] == "admin"):
         return redirect(url_for('admin'))
-
+    #haetaan haravat tietokannasta
+    haravatiedot = []
+    haravointi = tietokanta.select(Peliharavat)
+    with tietokanta.engine.connect() as yhteys:
+        for rivi in yhteys.execute(haravointi):
+            haravatiedot.append(rivi)
+    print(haravatiedot)
     #haetaan käyttäjän tiedot tietokannasta
     palkintotiedot = []
     palkintorahat = 0
+    sisaanostot = 0
     palkintodollarit = 0
+    sisadollarit = 0
     palkintocdollarit = 0
+    sisacdollarit = 0
     palkintotdollarit = 0
+    sisatdollarit = 0
     palkintoeurot = 0
+    sisaeurot = 0
     palkintoliput = 0
+    sisaliput = 0
     hakupalkkitiedot = pokeritietohakupalkki()
     uniikittyypit = hakupalkkitiedot[0]
     uniikitnimet = hakupalkkitiedot[1]
@@ -895,6 +914,9 @@ def pokeridata():
         for rivi in yhteys.execute(rahatiedot):
             palkintotiedot.append(rivi)
     tiedot = dict()
+    haravakentat = {"haravasumma":0, "haravaliput":0, "haravakoko":0}
+    haravasumma = 0;
+    haravaliput = 0;
     for i in palkintotiedot:
         tiedot.update({i[9]:{
                             "Pelityyppi": i[2],
@@ -910,28 +932,53 @@ def pokeridata():
     for i, j in tiedot.items():
         j["Sisäänosto"] = round(j["Sisäänosto"], 2)
         j["Palkintorahat"] = round(j["Palkintorahat"], 2)
+        j["Sisäänosto"] = round(j["Sisäänosto"], 2)
         if(j["Palkintovaluutta"] == "$"):
             palkintodollarit += j["Palkintorahat"]
-        elif(j["Palkintovaluutta"] == "C$"):
+        if(j["Ostovaluutta"] == "$"):
+            sisadollarit += j["Sisäänosto"]
+        if(j["Palkintovaluutta"] == "C$"):
             palkintocdollarit += j["Palkintorahat"]
-        elif(j["Palkintovaluutta"] == "T$"):
+        if(j["Ostovaluutta"] == "C$"):
+            sisacdollarit += j["Sisäänosto"]
+        if(j["Palkintovaluutta"] == "T$"):
             palkintotdollarit += j["Palkintorahat"]
-        elif(j["Palkintovaluutta"] == "€"):
+        if(j["Ostovaluutta"] == "T$"):
+            sisatdollarit += j["Sisäänosto"]
+        if(j["Palkintovaluutta"] == "€"):
             palkintoeurot += j["Palkintorahat"]
-        elif(j["Palkintovaluutta"] == "Lippu"):
+        if(j["Ostovaluutta"] == "€"):
+            sisaeurot += j["Sisäänosto"]
+        if(j["Palkintovaluutta"] == "Lippu"):
             palkintoliput += j["Palkintorahat"]
+        if(j["Ostovaluutta"] == "Lippu"):
+            sisaliput += j["Sisäänosto"]
         palkintorahat += j["Palkintorahat"]
+        sisaanostot += j["Sisäänosto"]
+        for k, l in haravatiedot:
+            if(k == j["Pelityyppi"] or k == j["Nimi"]):
+                if(j["Ostovaluutta"] == "Lippu"):
+                    haravaliput += int(l)/100*float(j["Sisäänosto"])
+                else:
+                    haravasumma += int(l)/100*float(j["Sisäänosto"])
+    haravakentat = {"haravasumma":round(haravasumma, 2), "haravaliput":round(haravaliput,2), "haravakoko": round(haravasumma+haravaliput,2)}
 
-    rahat = {"palkintorahat": palkintorahat}
+    rahat = {"palkintorahat": palkintorahat, "ostot": sisaanostot}
     palkinnot = {"$": palkintodollarit,
                 "C$": palkintocdollarit,
                 "T$": palkintotdollarit,
                 "€": palkintoeurot,
                 "liput": palkintoliput}
+    kulut = {"$": sisadollarit,
+            "C$": sisacdollarit,
+            "T$": sisatdollarit,
+            "€": sisaeurot,
+            "liput": sisaliput}
     return render_template('pokeridata.html', rahat=rahat, palkinnot=palkinnot,
     pelityypit=sorted(uniikittyypit), nimet=sorted(uniikitnimet),
     ostot=sorted(uniikitostot), ostovaluutat=sorted(uniikitostovaluutat),
-    palkintovaluutat=sorted(uniikitpalkintovaluutat), tiedot=tiedot)
+    palkintovaluutat=sorted(uniikitpalkintovaluutat), tiedot=tiedot,
+    pelimaara=len(tiedot), haravakentat=haravakentat, kulut=kulut)
 
 
 #käsitellään FC-laivojen gilinjakolaskuri
