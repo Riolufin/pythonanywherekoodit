@@ -515,8 +515,39 @@ function naytaPokeritiedot(haetuttiedot){
     var ostoeurot = 0;
     var palkintoliput = 0;
     var ostoliput = 0;
+    //muuttuja sijoituskeskiarvojen laskemiseen jos haettiin vain tiettyä pelityyppiä
+    var pelkkaspin = 1;
+    var spinsijoitus = 0;
+    var spinosallistujat = 0;
+    var pelkkaturnaus = 1;
+    var turnaussijoitus = 0;
+    var turnausosallistujat = 0;
+    var pelkkamystery = 1;
+    var mysterysijoitus = 0;
+    var mysteryosallistujat = 0;
     //lasketaan palkinnot eri valuutoissa
     for(var i in haetuttiedot){
+        if(haetuttiedot[i].Pelityyppi != "Spin & Gold"){
+            pelkkaspin = 0;
+        }
+        if(pelkkaspin === 1){
+            spinsijoitus += haetuttiedot[i].Sijoitus;
+            spinosallistujat += haetuttiedot[i].Osallistujat;
+        }
+        if(haetuttiedot[i].Pelityyppi != "Turnaus"){
+            pelkkaturnaus = 0;
+        }
+        if(pelkkaturnaus === 1){
+            turnaussijoitus += haetuttiedot[i].Sijoitus;
+            turnausosallistujat += haetuttiedot[i].Osallistujat;
+        }
+        if(haetuttiedot[i].Pelityyppi != "Mystery Battle Royale"){
+            pelkkamystery = 0;
+        }
+        if(pelkkamystery === 1){
+            mysterysijoitus += haetuttiedot[i].Sijoitus;
+            mysteryosallistujat += haetuttiedot[i].Osallistujat;
+        }
         pelimaara += 1;
         palkintorahat += parseFloat(haetuttiedot[i].Palkintorahat);
         ostorahat += parseFloat(haetuttiedot[i].Sisäänosto);
@@ -575,6 +606,22 @@ function naytaPokeritiedot(haetuttiedot){
     var sisaanostokentta = document.getElementById("sisaanostokentta");
     var kaikkisisaanostot = document.getElementById("kaikkisisaanostot");
     var voittotappiokentta = document.getElementById("voittotappio");
+    var sijoituskentta = document.getElementById("sijoituskentta");
+    sijoituskentta.innerHTML = "";
+    if(pelkkaspin === 1){
+        keskispinsij = (Math.round((spinsijoitus/pelimaara + Number.EPSILON)*100)/100).toFixed(2);
+        keskispinos = (Math.round((spinosallistujat/pelimaara + Number.EPSILON)*100)/100).toFixed(2);
+        sijoituskentta.innerHTML += `Keskisijoitus on <b>${keskispinsij}</b> osallistujamäärästä ${keskispinos}`
+    }
+    if(pelkkaturnaus === 1){
+        keskiturnaussij = ((Math.round((turnaussijoitus/turnausosallistujat + Number.EPSILON)*100)/100)*100).toFixed(0);
+        sijoituskentta.innerHTML += `Sijoitusprosentti on <b>${keskiturnaussij}</b> %`
+    }
+    if(pelkkamystery === 1){
+        keskimysterysij = (Math.round((mysterysijoitus/pelimaara + Number.EPSILON)*100)/100).toFixed(2);
+        keskimysteryos = (Math.round((mysteryosallistujat/pelimaara + Number.EPSILON)*100)/100).toFixed(2);
+        sijoituskentta.innerHTML += `Keskisijoitus on <b>${keskimysterysij}</b> osallistujamäärästä ${keskimysteryos}`
+    }
     voittotappiokentta.innerHTML = "<h2>Voitto/tappio dollareissa:</h2>";
     palkintokentta.innerHTML = "";
     sisaanostokentta.innerHTML = "";
@@ -622,20 +669,26 @@ function naytaPokeritiedot(haetuttiedot){
     ostorahat = (Math.round((ostorahat + Number.EPSILON)*100)/100).toFixed(2);
     voittotappiodol = (Math.round(((ostodollarit - palkintodollarit) + Number.EPSILON)*100)/100).toFixed(2);
     voittotappio = (Math.round(((ostorahat - palkintorahat) + Number.EPSILON)*100)/100).toFixed(2);
+    var palautusprosenttidol = ((Math.round((palkintodollarit/ostodollarit + Number.EPSILON)*100)/100)*100).toFixed(0);
+    var palautusprosenttirahat = ((Math.round((palkintorahat/ostorahat + Number.EPSILON)*100)/100)*100).toFixed(0);
     kaikkipalkinnot.innerHTML = `<br>Kaikki palkinnot yhteensä: <b>${palkintorahat}</b>`;
     kaikkisisaanostot.innerHTML = `<br>Kaikki sisäänostot yhteensä: <b>${ostorahat}</b>`;
     if(voittotappiodol <= 0){
-        voittotappiokentta.innerHTML += `Voittoa yhteensä $${-voittotappiodol}`
+        voittotappiokentta.innerHTML += `Voittoa yhteensä $${-voittotappiodol} ja
+                            palautusprosentti on ${palautusprosenttidol} %`
     }
     if(voittotappiodol > 0){
-        voittotappiokentta.innerHTML += `Tappiota yhteensä $${voittotappiodol}`
+        voittotappiokentta.innerHTML += `Tappiota yhteensä $${voittotappiodol} ja
+                            palautusprosentti on ${palautusprosenttidol} %`
     }
     voittotappiokentta.innerHTML += `<br><h2>Voitto/tappio kaikilla valuutoilla:</h2>`
     if(voittotappio <= 0){
-        voittotappiokentta.innerHTML += `Voittoa yhteensä ${-voittotappio}`
+        voittotappiokentta.innerHTML += `Voittoa yhteensä ${-voittotappio} ja
+                            palautusprosentti on ${palautusprosenttirahat} %`
     }
     if(voittotappio > 0){
-        voittotappiokentta.innerHTML += `Tappiota yhteensä ${voittotappio}`
+        voittotappiokentta.innerHTML += `Tappiota yhteensä ${voittotappio} ja
+                            palautusprosentti on ${palautusprosenttirahat} %`
     }
     pelimaarakentta.innerHTML = `<p>Pelejä yhteensä ${pelimaara}</p>`;
 }

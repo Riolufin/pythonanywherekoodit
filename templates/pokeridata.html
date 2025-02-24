@@ -49,6 +49,7 @@
         </div>
         </div>
         <h2>Pelien tiedot</h2>
+        <div id="sijoituskentta"></div>
         <div id="palkintokentta">
             {% for key, value in palkinnot.items() %}
                 {% if value > 0 %}
@@ -87,16 +88,16 @@
         <div id="voittotappio">
             <h2>Voitto/tappio dollareissa:</h2>
             {% if palkinnot["$"] >= kulut["$"] %}
-                Voittoa yhteensä ${{ palkinnot["$"] - kulut["$"] }}
+                Voittoa yhteensä ${{ palkinnot["$"] - kulut["$"] }} ja palautusprosentti on {{ (palkinnot["$"]/kulut["$"]*100)|round(0) }} %
             {% else %}
-                Tappiota yhteensä ${{ kulut["$"] - palkinnot["$"] }}
+                Tappiota yhteensä ${{ kulut["$"] - palkinnot["$"] }} ja palautusprosentti on {{ (palkinnot["$"]/kulut["$"]*100)|round(0) }} %
             {% endif %}
             <br>
             <h2>Voitto/tappio kaikilla valuutoilla:</h2>
             {% if rahat["ostot"] <= rahat["palkintorahat"] %}
-                Voittoa yhteensä {{ rahat["palkintorahat"] - rahat["ostot"] }}
+                Voittoa yhteensä {{ rahat["palkintorahat"] - rahat["ostot"] }} ja palautusprosentti on {{ (rahat["palkintorahat"]/rahat["ostot"]*100)|round(0) }} %
             {% else %}
-                Tappiota yhteensä {{ rahat["ostot"] - rahat["palkintorahat"] }}
+                Tappiota yhteensä {{ rahat["ostot"] - rahat["palkintorahat"] }} ja palautusprosentti on {{ (rahat["palkintorahat"]/rahat["ostot"]*100)|round(0) }} %
             {% endif %}
         </div>
         <p id="pelimaara">Pelejä yhteensä {{ pelimaara }}</p>
