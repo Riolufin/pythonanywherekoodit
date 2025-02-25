@@ -470,6 +470,57 @@ function piilotaKaikki(){
     nayta.setAttribute("hidden", "hidden");
 }
 
+//Mahdollistetaan aamupalataulukon muokkaus
+function muokkaaAamupala(){
+    var aamupaladivi = document.getElementById("aamupalalista");
+    var taulukko = document.getElementById("aamupalabody");
+    var aamupalaotsikot = document.getElementById("aamupalaotsikot");
+    aamupalaotsikot.innerHTML += `<th scope="col" id="poistaaamupalasarake">Poista rivi</th>`
+    var muokkaanappi = document.getElementById("muokkaaaamupala");
+    muokkaanappi.remove();
+    var lisaarivinappi = document.getElementById("lisaaaamupalarivi");
+    lisaarivinappi.remove();
+    var rivit = taulukko.rows.length;
+    for(let i = 0; i < rivit; i++){
+        taulukko.innerHTML += `<tr><td><input type="text" id="tuote${i + 1}"/></td>
+                    <td><input type="text" id="hinta${i + 1}"/></td>
+                    <td><input type="text" id="tarvitaan${i + 1}"/></td>
+                    <td><input type="text" id="ostettu${i + 1}"/></td>
+                    <td><input type="text" id="hintaero${i + 1}"/></td>
+                    <td><input type="checkbox" class="adminbox" name="poistaaamu${i + 1}"</td></tr>`;
+
+        console.log("jööti");
+    }
+    aamupaladivi.innerHTML += `<input type="submit"
+                    value="Tallenna" id="tallennaaamupalataulu"
+                    onclick="tallennaAamupalat()"/>`;
+}
+
+//Lisätään aamupalataulukkoon uusi rivi
+function lisaaAamupalarivi(){
+    var taulukko = document.getElementById("aamupalabody");
+    var rivinro = taulukko.rows.length;
+    taulukko.innerHTML += `<tr><td><input type="text" id="tuote${rivinro + 1}"/></td>
+                    <td><input type="text" id="hinta${rivinro + 1}"/></td>
+                    <td><input type="text" id="tarvitaan${rivinro + 1}"/></td>
+                    <td><input type="text" id="ostettu${rivinro + 1}"/></td>
+                    <td><input type="text" id="hintaero${rivinro + 1}"/></td></tr>`
+}
+
+//Tallennetaan aamupalataulun tiedot ja näytetään staattinen aamupalataulu
+function tallennaAamupalat(){
+    var taulukko = document.getElementById("aamupalabody");
+    for(var rivi = 0; rivi < taulukko.rows.length; rivi++){
+        for(var sarake = 0, i = taulukko.rows[rivi].cells.length; sarake < i; sarake++){
+            if(taulukko.rows[rivi].cells[sarake].childNodes[0].type != "checkbox"){
+                console.log(taulukko.rows[rivi].cells[sarake].childNodes[0].value);
+            }
+            else{
+                console.log(taulukko.rows[rivi].cells[sarake].childNodes[0].checked);
+            }
+        }
+    }
+}
 //------------------------------------------------------------------------------
 //funktioita
 

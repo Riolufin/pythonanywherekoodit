@@ -137,6 +137,24 @@
             </form>
         </div>
         </div>
+        <div id="aamupalalista">
+            <table id="aamupalataulu">
+                <caption><b>Aamupalat</b></caption>
+                <thead>
+                    <tr id="aamupalaotsikot">
+                        <th scope="col">Tuote</th>
+                        <th scope="col">Hinta</th>
+                        <th scope="col">Tarvitaan kpl</th>
+                        <th scope="col">Ostettu kpl</th>
+                        <th scope="col">Hintaero arvioon yht.</th>
+                    </tr>
+                </thead>
+                <tbody id="aamupalabody">
+                </tbody>
+            </table>
+            <input type="submit" value="Muokkaa" id="muokkaaaamupala" onclick="muokkaaAamupala()"/>
+            <input type="submit" value="Lisää rivi" id="lisaaaamupalarivi" onclick="lisaaAamupalarivi()"/>
+        </div>
         {% endblock %}
     </body>
 </html>
