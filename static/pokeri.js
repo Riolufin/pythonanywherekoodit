@@ -500,27 +500,113 @@ function muokkaaAamupala(){
 function lisaaAamupalarivi(){
     var taulukko = document.getElementById("aamupalabody");
     var rivinro = taulukko.rows.length;
+    var muokkaanappi = document.getElementById("muokkaaaamupala");
+    muokkaanappi.remove();
+    var lisaarivinappi = document.getElementById("lisaaaamupalarivi");
+    lisaarivinappi.remove();
+    var aamupaladivi = document.getElementById("aamupalalista");
     taulukko.innerHTML += `<tr><td><input type="text" id="tuote${rivinro + 1}"/></td>
                     <td><input type="text" id="hinta${rivinro + 1}"/></td>
                     <td><input type="text" id="tarvitaan${rivinro + 1}"/></td>
                     <td><input type="text" id="ostettu${rivinro + 1}"/></td>
                     <td><input type="text" id="hintaero${rivinro + 1}"/></td></tr>`
+
+    aamupaladivi.innerHTML += `<input type="submit"
+                    value="Tallenna" id="tallennaaamupalataulu"
+                    onclick="tallennaAamupalat()"/>`;
 }
 
 //Tallennetaan aamupalataulun tiedot ja näytetään staattinen aamupalataulu
 function tallennaAamupalat(){
     var taulukko = document.getElementById("aamupalabody");
-    for(var rivi = 0; rivi < taulukko.rows.length; rivi++){
+    var aamupalat = [];
+    rivimaara = taulukko.rows.length;
+    //haetaan taulukon arvot
+    for(var rivi = 0; rivi < rivimaara; rivi++){
+        for(var sarake = 0, i = taulukko.rows[rivi].cells.length; sarake < i; sarake++){
+            aamupalat.push(taulukko.rows[rivi].cells[sarake].childNodes[0].value);
+        }
+    }
+    //asetetaan taulukon arvot jsoniin avain-arvo-pareiksi
+    var aamupalajson = {};
+    aamupalajson[rivimaara] = {};
+    var apulaskuri = 1;
+    var otsikkolaskuri = 1;
+    for(let i = 1; i < aamupalat.length + 1; i++){
+        if(otsikkolaskuri === 1){
+            aamupalajson[rivimaara][`tuote${apulaskuri}`] = aamupalat[i - 1];
+        }
+        if(otsikkolaskuri === 2){
+            aamupalajson[rivimaara][`hinta${apulaskuri}`] = aamupalat[i - 1];
+        }
+        if(otsikkolaskuri === 3){
+            aamupalajson[rivimaara][`tarvii${apulaskuri}`] = aamupalat[i - 1];
+        }
+        if(otsikkolaskuri === 4){
+            aamupalajson[rivimaara][`ostettu${apulaskuri}`] = aamupalat[i - 1];
+        }
+        if(otsikkolaskuri === 5){
+            aamupalajson[rivimaara][`hintaero${apulaskuri}`] = aamupalat[i - 1];
+        }
+        if(otsikkolaskuri === 5){
+            apulaskuri += 1;
+            otsikkolaskuri = 1;
+        }
+        otsikkolaskuri += 1;
+    }
+    //tehdään ajax-kutsu
+        $.ajax({
+            type: "POST",
+            url: "/aamupalatallennus",
+            data: JSON.stringify(aamupalajson),
+            contentType: "application/json",
+            dataType: 'json'
+        }).done(function (response){
+            console.log(response);
+            aamupalaLisatty(response);
+        }).fail(function (response){
+            console.log("Virhe tietojen haussa");
+        });
+}
+
+//käsitellään aamupalan lisäyksen onnistuminen
+function aamupalaLisatty(aamupalat){
+    var taulukko = document.getElementById("aamupalabody");
+    taulukko.innerHTML = "";
+    var rivilaskuri = 1;
+    for(i in aamupalat){
+        tuote = `tuote${i}`;
+        tuote = aamupalat[i][tuote];
+        hinta = `hinta${i}`;
+        hinta = aamupalat[i][hinta];
+        tarvii = `tarvii${i}`;
+        tarvii = aamupalat[i][tarvii];
+        ostettu = `ostettu${i}`;
+        ostettu = aamupalat[i][ostettu];
+        hintaero = `hintaero${i}`;
+        hintaero = aamupalat[i][hintaero];
+        taulukko.innerHTML += `<tr><td>${tuote}</td>
+                            <td>${hinta}</td><td>${tarvii}</td>
+                            <td>${ostettu}</td><td>${hintaero}</td></tr>`;
+    }
+
+    }
+
+//käsitellään aamupalan poisto
+function poistaAamupala(){
+    //haetaan taulukon arvot
+    for(var rivi = 0; rivi < rivimaara; rivi++){
         for(var sarake = 0, i = taulukko.rows[rivi].cells.length; sarake < i; sarake++){
             if(taulukko.rows[rivi].cells[sarake].childNodes[0].type != "checkbox"){
-                console.log(taulukko.rows[rivi].cells[sarake].childNodes[0].value);
+                aamupalat.push(taulukko.rows[rivi].cells[sarake].childNodes[0].value);
             }
             else{
-                console.log(taulukko.rows[rivi].cells[sarake].childNodes[0].checked);
+                aamupalat.push(taulukko.rows[rivi].cells[sarake].childNodes[0].checked);
             }
         }
     }
 }
+
 //------------------------------------------------------------------------------
 //funktioita
 

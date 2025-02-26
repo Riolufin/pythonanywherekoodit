@@ -1,16 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #author Jiri Lahtinen
-#version 23.2.2025
+#version 26.2.2025
 
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 import hashlib
 from functools import wraps
 from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy
+import json
 
 app = Flask(__name__)
 app.secret_key = 'xxx'
+
+aamupalatiedosto = "xxx"
+
 
 #valmistellaan tietokantayhteys
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
@@ -744,6 +748,29 @@ def budjetti():
         error = "Nappia ei löytynyt"
 
     return render_template('budjetti.html', tulot=tulot, menot=menot, virheet=virheet, kentat=kentat)
+
+
+#aamupalan lisäyksen käsittely
+@app.route('/aamupalatallennus', methods=['POST', 'GET'])
+@auth
+def aamupalatallennusfunktio():
+    #tarkistetaan onko käyttäjä admin ja jos on, siirrytään admin-sivulle
+    if(session["kayttaja"] == "admin"):
+        return redirect(url_for('admin'))
+    #avataan aamupalatiedosto
+    with open(aamupalatiedosto) as f:
+        data = json.load(f)
+    #käsitellään kaikki POST-pyynnöt
+    if request.method == "POST":
+        aamupalatiedot = request.get_json()
+        data.update(aamupalatiedot)
+        #tallennetaan annettu data json-tiedostoon
+        with open(aamupalatiedosto, "w") as uusidata:
+            print("paska")
+            json.dump(data, uusidata)
+        return data
+
+    return redirect(url_for('budjetti'))
 
 
 #logout sivun käsittely
